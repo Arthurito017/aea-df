@@ -905,6 +905,7 @@
 
 
         <script>
+            const API = 'https://aeadf-backend.onrender.com';
             function toggleSidebar() {
                 const sidebar = document.getElementById('sidebar');
                 const toggleBtn = document.getElementById('toggleBtn');
@@ -943,6 +944,7 @@
 
         </script>
         <script>
+
             document.addEventListener("DOMContentLoaded", carregarUsuarios);
             const funcao = localStorage.getItem('funcao');
             if (funcao !== 'administrativo') {
@@ -961,7 +963,7 @@
             });
 
             function carregarUsuarios() {
-                fetch('/api/usuarios')
+                fetch(`${API}/api/usuarios`)
                     .then(res => res.json())
                     .then(usuarios => {
                         usuariosTotais = usuarios;
@@ -1096,7 +1098,7 @@
                     return;
                 }
 
-                fetch('/api/usuarios', {
+                fetch(`${API}/api/usuarios`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ nome, cpf, funcao, diretoria })
@@ -1128,7 +1130,7 @@
             }
             function logout() {
                 localStorage.clear();
-                window.location.href = "login_siage.html";
+                window.location.href = "index.html";
             }
             document.getElementById('novaFuncao').addEventListener('change', function () {
                 const campoDiretoria = document.getElementById('campoDiretoria');
@@ -1246,7 +1248,7 @@
                 };
 
 
-                fetch('/api/atendimentos', {
+                fetch(`${API}/api/atendimentos`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dados)
@@ -1277,7 +1279,7 @@
             });
 
             function carregarAtendimentos() {
-                fetch('/api/atendimentos')
+                fetch(`${API}/api/atendimentos`)
                     .then(res => res.json())
                     .then(lista => {
                         const dep = document.getElementById('filtroDepartamento').value.trim();
@@ -1460,7 +1462,7 @@
                     });
             });
             function visualizarAtendimento(id) {
-                fetch('/api/atendimentos')
+                fetch(`${API}/api/atendimentos`)
                     .then(res => res.json())
                     .then(lista => {
                         const atendimento = lista.find(a => a.id === id);
@@ -1545,7 +1547,7 @@
 
 
             function abrirModalAtendimentos() {
-                fetch('/api/atendimentos')
+                fetch(`${API}/api/atendimentos`)
                     .then(res => res.json())
                     .then(lista => {
                         const corpo = document.getElementById('corpoModalAtendimentos');
@@ -1627,7 +1629,7 @@
 
             async function carregarResumoGeral(periodo = '', diretoria = '', situacao = '') {
                 try {
-                    const res = await fetch(`/api/atendimentos/resumo?periodo=${periodo}&diretoria=${diretoria}&situacao=${situacao}`);
+                    fetch(`${API}/api/atendimentos/resumo?periodo=${periodo}&diretoria=${diretoria}&situacao=${situacao}`)
                     const data = await res.json();
 
                     document.getElementById('totalAtendimentos').textContent = data.total || 0;
@@ -1704,7 +1706,7 @@
                     const funcao = localStorage.getItem('funcao');
                     const loginDiretoria = localStorage.getItem('diretoria');
 
-                    const res = await fetch(`/api/atendimentos/grafico-data?funcao=${funcao}&loginDiretoria=${loginDiretoria}&periodo=${periodo}`);
+                    const res = await ffetch(`${API}/api/atendimentos/grafico-data?funcao=${funcao}&loginDiretoria=${loginDiretoria}&periodo=${periodo}`)
                     const data = await res.json();
 
                     const labels = data.map(item => item.dia);

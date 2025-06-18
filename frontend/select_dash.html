@@ -306,7 +306,7 @@
                 function sair() {
                     localStorage.removeItem('nome');
                     localStorage.removeItem('funcao');
-                    window.location.href = 'login_siage.html';
+                    window.location.href = 'index.html';
                 }
             </script>
 
@@ -330,7 +330,7 @@
 
                 const diretoria = mapaDiretorias[diretoriaNomeCompleto] || '';
                 if (!nome || !funcao) {
-                    window.location.href = 'login_siage.html';
+                    window.location.href = 'index.html';
                 } else {
                     document.getElementById('bemvindo').innerText = `Bem-vindo, ${nome}`;
                 }

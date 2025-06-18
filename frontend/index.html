@@ -80,6 +80,7 @@
   </div>
 
   <script>
+    const API = 'https://aeadf-backend.onrender.com';
     // Máscara automática de CPF
     document.getElementById('cpf').addEventListener('input', function (e) {
       let value = e.target.value.replace(/\D/g, '');
@@ -104,7 +105,7 @@
         return;
       }
 
-      fetch('http://localhost:3000/api/login', {
+      fetch(`${API}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cpf }) // Envia formatado com traço

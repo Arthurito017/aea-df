@@ -6,17 +6,21 @@ const db = require('../config/database');
 router.post('/login', async (req, res) => {
   const { cpf } = req.body;
 
- try {
-    const [results] = await db.query('SELECT nome, funcao, diretoria FROM usuarios WHERE cpf = ?', [cpf]);
+  try {
+    const result = await db.query(
+      'SELECT nome, funcao, diretoria FROM usuarios WHERE cpf = $1',
+      [cpf]
+    );
 
-    if (results.length === 0) {
+    if (result.rows.length === 0) {
       return res.status(401).json({ error: 'CPF não encontrado' });
     }
 
-    const user = results[0];
+    const user = result.rows[0];
     req.session.user = {
       nome: user.nome,
-      funcao: user.funcao
+      funcao: user.funcao,
+      diretoria: user.diretoria
     };
 
     res.json({

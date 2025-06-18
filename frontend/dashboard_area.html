@@ -800,7 +800,7 @@
                 }
                 function logout() {
                     localStorage.clear();
-                    window.location.href = "login_siage.html";
+                    window.location.href = "index.html";
                 }
                 const novaFuncaoEl = document.getElementById('novaFuncao');
                 if (novaFuncaoEl) {
@@ -816,8 +816,9 @@
 
             </script>
             <script>
+                const API = 'https://aeadf-backend.onrender.com';
                 function carregarAtendimentos() {
-                    fetch("/api/atendimentos")
+                    fetch(`${API}/api/atendimentos`)
                         .then(res => res.json())
                         .then(lista => {
                             const funcao = (localStorage.getItem("funcao") || "")
@@ -885,7 +886,7 @@
                     const obs = prompt("Deseja adicionar uma observação?");
                     if (obs === null) return;
 
-                    fetch(`/api/atendimentos/${id}/status`, {
+                    fetch(`${API}/api/atendimentos/${id}/status`, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ situacao: "Confirmado", observacoes_extra: obs })
@@ -901,7 +902,7 @@
                     const obs = prompt("Informe o motivo do cancelamento:");
                     if (obs === null) return;
 
-                    fetch(`/api/atendimentos/${id}/status`, {
+                    fetch(`${API}/api/atendimentos/${id}/status`, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ situacao: "Cancelado", observacoes_extra: obs })
@@ -952,7 +953,7 @@
                     const situacao = document.getElementById("tipoAcao").value;
                     const observacoes_extra = document.getElementById("observacoesExtra").value;
 
-                    fetch(`/api/atendimentos/${id}/status`, {
+                    fetch(`${API}/api/atendimentos/${id}/status`, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ situacao, observacoes_extra })
@@ -967,7 +968,7 @@
                         .catch(() => alert("Erro ao atualizar status!"));
                 });
                 function verDetalhes(id) {
-                    fetch(`/api/atendimentos`)
+                    fetch(`${API}/api/atendimentos`)
                         .then(res => res.json())
                         .then(lista => {
                             const atendimento = lista.find(a => a.id === id);
@@ -1022,7 +1023,7 @@
                             loginDiretoria
                         });
 
-                        const res = await fetch(`/api/atendimentos/resumo?${query}`);
+                        const res = await fetch(`${API}/api/atendimentos/resumo?${query}`);
                         const data = await res.json();
 
                         document.getElementById('totalAtendimentos').textContent = data.total || 0;
