@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard AEA-DF</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+
+        .sidebar {
+            background-color: #f8f9fa;
+            border-right: 2px solid #e0e0e0;
+            color: #003E70;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+            border-bottom: 2px solid #e0e0e0;
+
+        }
+
+        .sidebar::before {
+            content: '';
+            display: block;
+            height: 4px;
+            background-color: #F39200;
+            /* dourado da AEA */
+            margin: -20px -15px 15px -15px;
+            border-radius: 8px 8px 0 0;
+        }
+
+
+
+        .nav-link {
+            color: #003E70;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            padding: 10px 12px;
+            border-radius: 6px;
+            transition: background-color 0.2s, color 0.2s;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            background-color: #F39200;
+            color: #fff !important;
+        }
+
+        .sidebar {
+            width: 333px;
+            /* antes era 220px */
+        }
+
+        .sidebar:not(.hidden)+.toggle-arrow {
+            left: 333px;
+            /* manter compatibilidade do botão */
+        }
+
+        .sidebar.hidden {
+            width: 0;
+            padding: 0;
+        }
+
+        .sidebar .logo {
+            max-width: 100%;
+            max-height: 60px;
+            object-fit: contain;
+            margin: 20px auto 10px;
+            /* ← Adiciona espaçamento no topo */
+            display: block;
+        }
+
+
+        .sidebar .logo-text,
+        .sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            /* espaçamento entre links */
+        }
+
+        .sidebar.hidden .logo-text,
+        .sidebar.hidden .text-center,
+        .sidebar.hidden nav {
+            display: none !important;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .sidebar.hidden .nav-link {
+            visibility: hidden;
+            display: none !important;
+        }
+
+
+        .toggle-arrow {
+            position: fixed;
+            top: 20px;
+            left: 10px;
+            background-color: #F39200;
+            color: white;
+            border: none;
+            border-radius: 0 6px 6px 0;
+            padding: 10px 12px;
+            z-index: 1100;
+            cursor: pointer;
+            transition: left 0.3s;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .sidebar.hidden+.toggle-arrow {
+            left: 0;
+        }
+
+        .sidebar:not(.hidden)+.toggle-arrow {
+            left: 264px;
+        }
+
+        .nav-link {
+            .nav-link {
+                color: #003E70;
+                margin: 10px 0;
+                display: flex;
+                align-items: center;
+                font-size: 0.95rem;
+                padding: 10px 12px;
+                border-radius: 6px;
+                transition: background-color 0.2s, color 0.2s;
+                font-weight: 500;
+
+                .nav-link {
+                    white-space: nowrap;
+                    /* impede quebra de linha */
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    /* adiciona "..." quando cortado */
+                }
+
+            }
+
+            .nav-link:hover {
+                background-color: #F39200;
+                color: #fff;
+            }
+        }
+
+        .nav-link:hover {
+            background-color: #F39200;
+        }
+
+        .nav-link.text-danger {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 12px;
+        }
+
+
+        .main-content {
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
+            padding: 30px;
+        }
+
+        .sidebar.hidden~.main-content {
+            margin-left: 0;
+        }
+
+        .modal-content-area {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 30px 25px;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05);
+            min-height: 85vh;
+            border-top: 5px solid #F39200;
+        }
+
+        .modal-content-area h5 {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #003E70;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-content-area h6 {
+            font-weight: 600;
+            color: #003E70;
+            margin-top: 30px;
+        }
+
+        .table-striped>tbody>tr:nth-of-type(odd) {
+            background-color: #f6f9fc;
+        }
+
+        .table thead {
+            background-color: #003E70;
+            color: #fff;
+        }
+
+        .table th,
+        .table td {
+            vertical-align: middle;
+            font-size: 0.95rem;
+        }
+
+        .btn-sm {
+            font-size: 0.85rem;
+            padding: 6px 10px;
+            font-weight: 500;
+        }
+
+        .btn-warning {
+            background-color: #F39200;
+            border: none;
+        }
+
+        .btn-warning:hover {
+            background-color: #da7e00;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #b42a3a;
+        }
+
+        .btn-success {
+            background-color: #198754;
+        }
+
+        .btn-success:hover {
+            background-color: #146c43;
+        }
+
+        #campoDiretoria select,
+        #novaFuncao,
+        #novoCpf,
+        #novoNome {
+            font-size: 0.95rem;
+            border-radius: 6px;
+            box-shadow: none;
+            border: 1px solid #ced4da;
+        }
+
+        #campoDiretoria label,
+        .modal-content-area label {
+            font-weight: 500;
+            color: #003E70;
+        }
+
+
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                height: 100%;
+                top: 0;
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding: 15px;
+            }
+
+            .toggle-arrow {
+                top: 10px;
+            }
+        }
+
+        #bemvindoTexto {
+            color: #003E70;
+            margin-top: 10px;
+            margin-left: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                height: 100%;
+                top: 0;
+                left: 0;
+                z-index: 1000;
+            }
+
+            .toggle-arrow {
+                left: 0 !important;
+                z-index: 1100;
+            }
+
+            .sidebar:not(.hidden)+.toggle-arrow {
+                left: 332px !important;
+            }
+        }
+
+        body.modal-open #toggleBtn {
+            display: none !important;
+        }
+
+        .logo-img {
+            padding: 15px;
+
+        }
+
+        /* Esconde o botão de notificações quando sidebar estiver escondida */
+        .sidebar.hidden #notificacaoContainer {
+            display: none !important;
+        }
+
+        /* Badge discreto, institucional */
+        #notificacaoBadge {
+            min-width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            padding: 0 5px;
+            line-height: 18px;
+        }
+
+        .notificacao-box {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sidebar.hidden .notificacao-box {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.9);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar">
+            <div class="logo-img">
+                <a href="./select_dash.html">
+                    <img src="./img/logo_aeadf-2.png" alt="Logo AEA-DF" class="logo">
+                </a>
+            </div>
+            <div class="logo-text text-center mb-4">
+                <strong>SIAGE | AEA-DF</strong>
+            </div>
+            <div id="notificacaoContainer" class="notificacao-box text-center mb-3">
+                <button onclick="mostrarSecao('notificacoes')"
+                    class="btn btn-outline-primary position-relative shadow-sm d-inline-flex align-items-center justify-content-center"
+                    style="border-radius: 8px; width: 42px; height: 42px;">
+                    <i class="bi bi-bell fs-5"></i>
+                    <span id="notificacaoBadge"
+                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        style="font-size: 0.7rem;">
+                        0
+                    </span>
+                </button>
+            </div>
+
+
+
+            <div class="text-center mb-3">
+            </div>
+            <nav class="nav flex-column">
+                <a href="#" class="nav-link" onclick="mostrarSecao('resumo')"><i
+                        class="bi bi-bar-chart-fill me-2"></i>Resumo Geral</a>
+                <a href="#" class="nav-link" onclick="mostrarSecao('atendimentos')"><i
+                        class="bi bi-journal-text me-2"></i>Atendimentos</a>
+                <a href="#" class="nav-link" onclick="mostrarSecao('usuarios')"><i
+                        class="bi bi-people-fill me-2"></i>Gerenciar Usuários</a>
+                <a href="#" class="nav-link text-danger" onclick="logout()"><i
+                        class="bi bi-box-arrow-right me-2"></i>Sair</a>
+            </nav>
+            <div class="d-flex justify-content-end align-items-center px-4 pt-3">
+            </div>
+        </div>
+
+        <!-- Botão fixo -->
+        <button id="toggleBtn" class="toggle-arrow" onclick="toggleSidebar()">❮</button>
+        <!-- Conteúdo Principal -->
+        <div id="mainContent" class="main-content normal w-100 px-3 px-md-4 py-4">
+            <h4 id="bemvindoTexto" class="fw-semibold d-block">Bem-vindo(a), Usuário</h4>
+            <!-- Notificações -->
+            <div id="notificacoes" class="modal-content-area">
+                <h5 class="mb-3 text-primary fw-semibold">📢 Notificações</h5>
+                <p class="text-muted m-0">Nenhuma notificação por enquanto.</p>
+            </div>
+            <div id="resumo" class="modal-content-area d-none">
+                <h3 class="mb-3">📊 Resumo Geral de Atendimentos</h3>
+
+                <!-- Filtros -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <label for="filtroPeriodo" class="form-label">Período</label>
+                        <select class="form-select" id="filtroPeriodo">
+                            <option value="">Todos</option>
+                            <option value="24h">Últimas 24h</option>
+                            <option value="7d">Últimos 7 dias</option>
+                            <option value="30d">Último mês</option>
+                            <option value="ano">Este ano</option>
+                            <option value="2024">Ano 2024</option>
+                            <option value="2023">Ano 2023</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filtroDiretoria" class="form-label">Área de Atendimento</label>
+                        <select class="form-select" id="filtroDiretoria">
+                            <option value="">Todas</option>
+                            <option value="DE - Presidência">DE - Presidência</option>
+                            <option value="Diretoria de Administração">Diretoria de Administração</option>
+                            <option value="Diretoria de Finanças">Diretoria de Finanças</option>
+                            <option value="Diretoria de Esportes">Diretoria de Esportes</option>
+                            <option value="Diretoria de Saúde e Benefícios">Diretoria de Saúde e Benefícios</option>
+                            <option value="Diretoria de Eventos Sociais">Diretoria de Eventos Sociais</option>
+                            <option value="Diretoria de Cultura">Diretoria de Cultura</option>
+                            <option value="Conselho Deliberativo">Conselho Deliberativo</option>
+                            <option value="Conselho Fiscal">Conselho Fiscal</option>
+                            <option value="Diretoria Executiva">Diretoria Executiva</option>
+
+                            <!-- Adicione as demais -->
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filtroSituacao" class="form-label">Situação</label>
+                        <select class="form-select" id="filtroSituacao">
+                            <option value="">Todas</option>
+                            <option value="Agendado">Agendado</option>
+                            <option value="Agendado - Confirmado">Confirmado</option>
+                            <option value="Cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Cards de Métricas -->
+                <div class="row text-center mb-4">
+                    <div class="col-md-3">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Total</h5>
+                                <h3 id="totalAtendimentos">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-warning">Agendado</h5>
+                                <h3 id="totalAgendados">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">Confirmado</h5>
+                                <h3 id="totalConfirmados">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-danger">Cancelado</h5>
+                                <h3 id="totalCancelados">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico -->
+                <div class="card p-4 shadow-sm">
+                    <canvas id="graficoResumo" height="100"></canvas>
+                </div>
+            </div>
+
+
+
+            <canvas id="graficoResumo" height="100"></canvas>
+
+
+
+            <!-- ATENDIMENTOS -->
+            <div id="atendimentos" class="modal-content-area d-none">
+                <h5 class="mb-4 text-primary fw-semibold">Gerar Atendimento</h5>
+
+                <!-- 🔹 Formulário de Criação -->
+                <form id="formNovoAtendimento" class="border p-3 rounded mb-4 bg-light shadow-sm">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Solicitante</label>
+                            <input type="text" id="solicitanteAtendimento" class="form-control"
+                                placeholder="Nome do associado" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Data e Hora</label>
+                            <input type="datetime-local" id="dataHoraAtendimento" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Horário Fim</label>
+                            <input type="time" id="dataHoraFimAtendimento" class="form-control" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Canal de Atendimento</label>
+                            <select class="form-select" id="canalAtendimento">
+                                <option value="">Selecione</option>
+                                <option>Telefone/WhatsApp</option>
+                                <option>Presencial</option>
+                                <option>Email</option>
+                                <option>Outros</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Área de Atendimento</label>
+                            <select class="form-select" id="departamentoAtendimento">
+                                <option value="">Selecione</option>
+                                <option>Jurídico</option>
+                                <option>Contábil</option>
+                                <option>Administrativo</option>
+                                <option>Diretorias</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-none" id="campoDiretoriaAtendimento">
+                            <label class="form-label">Diretoria</label>
+                            <select class="form-select" id="diretoriaAtendimento">
+                                <option value="">Selecione a diretoria</option>
+                                <option>DE - Presidência</option>
+                                <option>Diretoria de Administração</option>
+                                <option>Diretoria de Finanças</option>
+                                <option>Diretoria de Esportes</option>
+                                <option>Diretoria de Saúde e Benefícios</option>
+                                <option>Diretoria de Eventos Sociais</option>
+                                <option>Diretoria de Cultura</option>
+                                <option>Conselho Deliberativo</option>
+                                <option>Conselho Fiscal</option>
+                                <option>Diretoria Executiva</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Assunto</label>
+                            <select class="form-select" id="assuntoAtendimento">
+                                <option>IR - Declaração</option>
+                                <option>IR - Proc. Administrativo</option>
+                                <option>IR - Proc. Judicial</option>
+                                <option>Funcef</option>
+                                <option>Fenacef</option>
+                                <option>Apcef</option>
+                                <option>Equacionamento</option>
+                                <option>Isenção IR – Lei doenças graves</option>
+                                <option>Contra cheque</option>
+                                <option>INSS</option>
+                                <option>Outros</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Observações</label>
+                            <textarea id="observacoesAtendimento" class="form-control" rows="2"
+                                placeholder="Detalhes do atendimento..."></textarea>
+                        </div>
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-success fw-semibold px-4">Salvar Atendimento</button>
+                        </div>
+                    </div>
+                </form>
+                <h5 class="mb-4 text-primary fw-semibold">Painel de Atendimentos</h5>
+                <!-- 🔍 Filtros -->
+                <div class="row mb-3 align-items-end">
+                    <div class="col-md-3">
+                        <label for="filtroDepartamento" class="form-label">Departamento:</label>
+                        <select id="filtroDepartamento" class="form-select">
+                            <option value="">Todos</option>
+                            <option>Jurídico</option>
+                            <option>Contábil</option>
+                            <option>Administrativo</option>
+                            <option>Diretorias</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filtroStatus" class="form-label">Situação:</label>
+                        <select id="filtroStatus" class="form-select">
+                            <option value="">Todas</option>
+                            <option>Agendado</option>
+                            <option>Agendado - Confirmado</option>
+                            <option>Pendente</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="filtroDataInicio" class="form-label">De:</label>
+                        <input type="date" id="filtroDataInicio" class="form-control" />
+                    </div>
+                    <div class="col-md-2">
+                        <label for="filtroDataFim" class="form-label">Até:</label>
+                        <input type="date" id="filtroDataFim" class="form-control" />
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <button onclick="abrirModalAtendimentos()" class="btn btn-outline-secondary w-100">
+                            👁️ Ver Todos
+                        </button>
+                    </div>
+                </div>
+
+
+                <!-- 📋 Lista de Atendimentos -->
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Departamento</th>
+                                <th>Diretoria</th>
+                                <th>Solicitante</th>
+                                <th>Atendente</th>
+                                <th>Data/Hora</th>
+                                <th>Horário Fim</th>
+                                <th>Assunto</th>
+                                <th>Situação</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaAtendimentos">
+                            <!-- Conteúdo carregado via JS -->
+                        </tbody>
+                    </table>
+                    <!-- 🔄 Paginação -->
+                    <nav>
+                        <ul class="pagination justify-content-center mt-3" id="paginacaoAtendimentos"></ul>
+                    </nav>
+
+                </div>
+            </div>
+            <div class="modal fade" id="modalEditarAtendimento" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <form id="formEditarAtendimento">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Editar Atendimento</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" id="editId">
+
+                                <h6 class="text-primary mt-2">🧍 Informações Pessoais</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Solicitante</label>
+                                        <input class="form-control" id="editSolicitante"
+                                            placeholder="Nome do associado">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Atendente</label>
+                                        <input class="form-control" id="editAtendente" placeholder="Nome do atendente">
+                                    </div>
+                                </div>
+
+                                <h6 class="text-primary mt-4">📅 Agendamento</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Data e Hora</label>
+                                        <input class="form-control" type="datetime-local" id="editDataHora">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Horário Fim</label>
+                                        <input type="time" class="form-control" id="editDataHoraFim">
+                                    </div>
+                                </div>
+
+                                <h6 class="text-primary mt-4">🏢 Detalhes do Atendimento</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Departamento</label>
+                                        <select class="form-select" id="editDepartamento">
+                                            <option>Jurídico</option>
+                                            <option>Contábil</option>
+                                            <option>Administrativo</option>
+                                            <option>Diretorias</option>
+                                        </select>
+                                        <div class="col-md-6 d-none" id="campoEditDiretoria">
+                                            <label class="form-label">Diretoria</label>
+                                            <select class="form-select" id="editDiretoria">
+                                                <option value="">Selecione a diretoria</option>
+                                                <option>DE - Presidência</option>
+                                                <option>Diretoria de Administração</option>
+                                                <option>Diretoria de Finanças</option>
+                                                <option>Diretoria de Esportes</option>
+                                                <option>Diretoria de Saúde e Benefícios</option>
+                                                <option>Diretoria de Eventos Sociais</option>
+                                                <option>Diretoria de Cultura</option>
+                                                <option>Conselho Deliberativo</option>
+                                                <option>Conselho Fiscal</option>
+                                                <option>Diretoria Executiva</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Assunto</label>
+                                        <select class="form-select" id="editAssunto">
+                                            <option>IR - Declaração</option>
+                                            <option>IR - Proc. Administrativo</option>
+                                            <option>IR - Proc. Judicial</option>
+                                            <option>Funcef</option>
+                                            <option>Fenacef</option>
+                                            <option>Apcef</option>
+                                            <option>Equacionamento</option>
+                                            <option>Isenção IR – Lei doenças graves</option>
+                                            <option>Contra cheque</option>
+                                            <option>INSS</option>
+                                            <option>Outros</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Canal</label>
+                                        <select class="form-select" id="editCanal">
+                                            <option>Telefone/WhatsApp</option>
+                                            <option>Presencial</option>
+                                            <option>Email</option>
+                                            <option>Outros</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Observações</label>
+                                        <textarea class="form-control" id="editObservacoes" placeholder="Observações"
+                                            rows="2"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn btn-primary" type="submit">Salvar Alterações</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL DE VISUALIZAÇÃO -->
+            <div class="modal fade" id="modalVisualizarAtendimento" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-primary fw-bold">
+                                <i class="bi bi-info-circle-fill me-2"></i> Detalhes do Atendimento
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body" id="conteudoAtendimentoDetalhes">
+                            <!-- Preenchido dinamicamente -->
+                        </div>
+                        <div class="modal-footer">
+                            <button onclick="imprimirAtendimentoDetalhes()" class="btn btn-outline-secondary">
+                                <i class="bi bi-printer me-2"></i>Imprimir
+                            </button>
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="modalTodosAtendimentos" tabindex="-1">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header d-flex justify-content-between align-items-center">
+                            <h5 class="modal-title">Todos os Atendimentos</h5>
+                            <div>
+                                <button class="btn btn-outline-primary btn-sm me-2"
+                                    onclick="imprimirTodosAtendimentos()">🖨️ Imprimir</button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table table-bordered table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Departamento</th>
+                                        <th>Diretoria</th>
+                                        <th>Solicitante</th>
+                                        <th>Atendente</th>
+                                        <th>Data/Hora</th>
+                                        <th>Assunto</th>
+                                        <th>Canal</th>
+                                        <th>Situação</th>
+                                        <th>Observações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="corpoModalAtendimentos"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <!-- CRUD de Usuários -->
+            <div id="usuarios" class="modal-content-area d-none">
+                <h5><i class="bi bi-person-badge-fill text-primary"></i> Gerenciamento de Usuários</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>CPF</th>
+                            <th>Função</th>
+                            <th>Diretoria</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-usuarios">
+                        <!-- Carregado via JS -->
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between mt-3 mb-2 flex-wrap gap-2">
+                    <div>
+                        <button class="btn btn-outline-primary btn-sm" onclick="abrirModalUsuarios()">👁️ Ver
+                            Todos</button>
+                    </div>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0" id="paginacaoUsuarios"></ul>
+                    </nav>
+                </div>
+
+
+                <h6 class="mt-4">➕ Cadastrar Novo Usuário</h6>
+                <div class="row g-2">
+                    <div class="col-md-4"><input type="text" class="form-control" id="novoNome" placeholder="Nome">
+                    </div>
+                    <div class="col-md-4"><input type="text" class="form-control" id="novoCpf" placeholder="CPF"
+                            maxlength="14">
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="novaFuncao">
+                            <option>administrativo</option>
+                            <option>juridico</option>
+                            <option>contabil</option>
+                            <option>diretorias</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4" id="campoDiretoria" style="display: none;">
+                        <select class="form-select" id="novaDiretoria">
+                            <option value="">Selecione a diretoria</option>
+                            <option>DE - Presidência</option>
+                            <option>Diretoria de Administração</option>
+                            <option>Diretoria de Finanças</option>
+                            <option>Diretoria de Esportes</option>
+                            <option>Diretoria de Saúde e Benefícios</option>
+                            <option>Diretoria de Eventos Sociais</option>
+                            <option>Diretoria de Cultura</option>
+                            <option>Conselho Deliberativo</option>
+                            <option>Conselho Fiscal</option>
+                            <option>Diretoria Executiva</option>
+                        </select>
+                    </div>
+                    <div class="col-12 text-end">
+                        <button class="btn btn-success btn-sm mt-2" onclick="cadastrarUsuario()">Cadastrar</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="modal fade" id="modalUsuariosTodos" tabindex="-1">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header d-flex justify-content-between align-items-center">
+                        <h5 class="modal-title">Todos os Usuários</h5>
+                        <div>
+                            <button class="btn btn-outline-secondary btn-sm me-2" onclick="imprimirUsuariosModal()">🖨️
+                                Imprimir</button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>CPF</th>
+                                    <th>Função</th>
+                                    <th>Diretoria</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpoModalUsuarios"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <script>
+            function toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                const toggleBtn = document.getElementById('toggleBtn');
+
+                sidebar.classList.toggle('hidden');
+
+                toggleBtn.innerHTML = sidebar.classList.contains('hidden')
+                    ? '<i class="bi bi-chevron-right"></i>'
+                    : '<i class="bi bi-chevron-left"></i>';
+            }
+
+            function mostrarSecao(secaoId) {
+                const secoes = ['notificacoes', 'alertas', 'formulario', 'resumo', 'atendimentos', 'gerar-alertas', 'usuarios'];
+                secoes.forEach(id => {
+                    const elemento = document.getElementById(id);
+                    if (elemento) elemento.classList.add('d-none');
+                });
+                const ativa = document.getElementById(secaoId);
+                if (ativa) ativa.classList.remove('d-none');
+
+                const notificacaoContainer = document.getElementById('notificacaoContainer');
+                if (sidebar.classList.contains('hidden')) {
+                    notificacaoContainer.style.display = 'none';
+                } else {
+                    notificacaoContainer.style.display = 'flex';
+                }
+
+            }
+            const notificacaoContainer = document.getElementById('notificacaoContainer');
+            if (sidebar.classList.contains('hidden')) {
+                notificacaoContainer.style.display = 'none';
+            } else {
+                notificacaoContainer.style.display = 'block';
+            }
+
+
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", carregarUsuarios);
+            const funcao = localStorage.getItem('funcao');
+            if (funcao !== 'administrativo') {
+                document.querySelector('[onclick="mostrarSecao(\'usuarios\')"]').style.display = 'none';
+            }
+            let usuariosTotais = [];
+            let paginaAtual = 1;
+            const usuariosPorPagina = 5;
+            document.getElementById('novoCpf').addEventListener('input', function () {
+                let valor = this.value.replace(/\D/g, '');
+                if (valor.length > 11) valor = valor.slice(0, 11);
+                this.value = valor
+                    .replace(/(\d{3})(\d)/, '$1.$2')
+                    .replace(/(\d{3})(\d)/, '$1.$2')
+                    .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            });
+
+            function carregarUsuarios() {
+                fetch('/api/usuarios')
+                    .then(res => res.json())
+                    .then(usuarios => {
+                        usuariosTotais = usuarios;
+                        renderizarTabela(paginarUsuarios(usuariosTotais));
+                        renderizarPaginacao(usuariosTotais.length);
+                    });
+            }
+
+            function paginarUsuarios(lista) {
+                const inicio = (paginaAtual - 1) * usuariosPorPagina;
+                const fim = inicio + usuariosPorPagina;
+                return lista.slice(inicio, fim);
+            }
+
+            function renderizarTabela(lista) {
+                const tabela = document.getElementById('tabela-usuarios');
+                tabela.innerHTML = '';
+
+                lista.forEach(u => {
+                    tabela.innerHTML += `
+      <tr id="linha-${u.id}">
+        <td><span id="nome-${u.id}">${u.nome}</span></td>
+        <td><span id="cpf-${u.id}">${u.cpf}</span></td>
+        <td><span id="funcao-${u.id}">${u.funcao}</span></td>
+        <td><span id="diretoria-${u.id}">${u.diretoria || '-'}</span></td>
+        <td>
+          <div class="d-flex flex-wrap gap-1">
+            <button class="btn btn-warning btn-sm w-100" onclick="ativarEdicao(${u.id})">✏️ Editar</button>
+            <button class="btn btn-success btn-sm w-100 d-none" id="btn-salvar-${u.id}" onclick="salvarEdicao(${u.id})">💾 Salvar</button>
+            <button class="btn btn-danger btn-sm w-100" onclick="deletarUsuario(${u.id})"><i class="bi bi-trash"></i></button>
+          </div>
+        </td>
+      </tr>`;
+                });
+            }
+
+            function ativarEdicao(id) {
+                const nome = document.getElementById(`nome-${id}`).innerText;
+                const cpf = document.getElementById(`cpf-${id}`).innerText;
+                const funcao = document.getElementById(`funcao-${id}`).innerText;
+                const diretoriaSpan = document.getElementById(`diretoria-${id}`);
+                const diretoria = diretoriaSpan ? diretoriaSpan.innerText : "";
+
+                document.getElementById(`linha-${id}`).innerHTML = `
+    <td><input class="form-control form-control-sm" id="edit-nome-${id}" value="${nome}" /></td>
+    <td><input class="form-control form-control-sm" id="edit-cpf-${id}" value="${cpf}" /></td>
+    <td>
+      <select class="form-select form-select-sm" id="edit-funcao-${id}" onchange="toggleDiretoriaSelect(${id})">
+        <option ${funcao === 'administrativo' ? 'selected' : ''}>administrativo</option>
+        <option ${funcao === 'juridico' ? 'selected' : ''}>juridico</option>
+        <option ${funcao === 'contabil' ? 'selected' : ''}>contabil</option>
+        <option ${funcao === 'diretorias' ? 'selected' : ''}>diretorias</option>
+      </select>
+    </td>
+    <td>
+      <select class="form-select form-select-sm ${funcao !== 'diretorias' ? 'd-none' : ''}" id="edit-diretoria-${id}">
+        <option value="">Selecione a diretoria</option>
+        <option ${diretoria === 'DE - Presidência' ? 'selected' : ''}>DE - Presidência</option>
+        <option ${diretoria === 'Diretoria de Administração' ? 'selected' : ''}>Diretoria de Administração</option>
+        <option ${diretoria === 'Diretoria de Finanças' ? 'selected' : ''}>Diretoria de Finanças</option>
+        <option ${diretoria === 'Diretoria de Esportes' ? 'selected' : ''}>Diretoria de Esportes</option>
+        <option ${diretoria === 'Diretoria de Saúde e Benefícios' ? 'selected' : ''}>Diretoria de Saúde e Benefícios</option>
+        <option ${diretoria === 'Diretoria de Eventos Sociais' ? 'selected' : ''}>Diretoria de Eventos Sociais</option>
+        <option ${diretoria === 'Diretoria de Cultura' ? 'selected' : ''}>Diretoria de Cultura</option>
+        <option ${diretoria === 'Conselho Deliberativo' ? 'selected' : ''}>Conselho Deliberativo</option>
+        <option ${diretoria === 'Conselho Fiscal' ? 'selected' : ''}>Conselho Fiscal</option>
+        <option ${diretoria === 'Diretoria Executiva' ? 'selected' : ''}>Diretoria Executiva</option>
+      </select>
+    </td>
+    <td>
+      <div class="d-flex flex-wrap gap-1">
+        <button class="btn btn-success btn-sm w-100" onclick="salvarEdicao(${id})">💾 Salvar</button>
+        <button class="btn btn-secondary btn-sm w-100" onclick="carregarUsuarios()">❌ Cancelar</button>
+      </div>
+    </td>
+  `;
+
+                // Atalho: pressionar Enter também salva
+                const campos = [`edit-nome-${id}`, `edit-cpf-${id}`, `edit-funcao-${id}`, `edit-diretoria-${id}`];
+                campos.forEach(c => {
+                    const el = document.getElementById(c);
+                    if (el) {
+                        el.addEventListener('keydown', e => {
+                            if (e.key === 'Enter') salvarEdicao(id);
+                        });
+                    }
+                });
+            }
+            function toggleDiretoriaSelect(id) {
+                const funcao = document.getElementById(`edit-funcao-${id}`).value;
+                const diretoriaSelect = document.getElementById(`edit-diretoria-${id}`);
+                if (diretoriaSelect) {
+                    diretoriaSelect.classList.toggle('d-none', funcao !== 'diretorias');
+                }
+            }
+
+            function salvarEdicao(id) {
+                const nome = document.getElementById(`edit-nome-${id}`).value;
+                const cpf = document.getElementById(`edit-cpf-${id}`).value;
+                const funcao = document.getElementById(`edit-funcao-${id}`).value;
+                const diretoriaEl = document.getElementById(`edit-diretoria-${id}`);
+                const diretoria = (funcao === 'diretorias' && diretoriaEl) ? diretoriaEl.value : null;
+
+                const atualizacoes = [
+                    { campo: 'nome', valor: nome },
+                    { campo: 'cpf', valor: cpf },
+                    { campo: 'funcao', valor: funcao }
+                ];
+
+                if (funcao === 'diretorias') {
+                    atualizacoes.push({ campo: 'diretoria', valor: diretoria });
+                }
+
+                Promise.all(atualizacoes.map(({ campo, valor }) =>
+                    fetch(`/api/usuarios/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ campo, valor })
+                    })
+                )).then(() => carregarUsuarios());
+            }
+
+            function cadastrarUsuario() {
+                const nome = document.getElementById('novoNome').value.trim();
+                const cpf = document.getElementById('novoCpf').value.trim(); // sem replace
+                const funcao = document.getElementById('novaFuncao').value;
+                const diretoriaSelect = document.getElementById('novaDiretoria');
+                const diretoria = funcao === 'diretorias' ? diretoriaSelect.value : null;
+
+                if (!nome || !cpf || !funcao) {
+                    alert("Preencha todos os campos!");
+                    return;
+                }
+
+                fetch('/api/usuarios', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, cpf, funcao, diretoria })
+                })
+                    .then(() => {
+                        carregarUsuarios();
+                        document.getElementById('novoNome').value = '';
+                        document.getElementById('novoCpf').value = '';
+                        document.getElementById('novaDiretoria').value = '';
+                        document.getElementById('campoDiretoria').style.display = 'none';
+                    });
+            }
+
+
+            function editarUsuario(id, campo, valor) {
+                fetch(`/api/usuarios/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ campo, valor })
+                }).then(carregarUsuarios);
+            }
+
+            function deletarUsuario(id) {
+                if (confirm('Tem certeza que deseja excluir?')) {
+                    fetch(`/api/usuarios/${id}`, {
+                        method: 'DELETE'
+                    }).then(carregarUsuarios);
+                }
+            }
+            function logout() {
+                localStorage.clear();
+                window.location.href = "login_siage.html";
+            }
+            document.getElementById('novaFuncao').addEventListener('change', function () {
+                const campoDiretoria = document.getElementById('campoDiretoria');
+                campoDiretoria.style.display = (this.value === 'diretorias') ? 'block' : 'none';
+            });
+
+            function renderizarPaginacao(totalUsuarios) {
+                const totalPaginas = Math.ceil(totalUsuarios / usuariosPorPagina);
+                const paginacao = document.getElementById('paginacaoUsuarios');
+                paginacao.innerHTML = '';
+
+                for (let i = 1; i <= totalPaginas; i++) {
+                    const li = document.createElement('li');
+                    li.className = `page-item ${i === paginaAtual ? 'active' : ''}`;
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    li.onclick = () => {
+                        paginaAtual = i;
+                        renderizarTabela(paginarUsuarios(usuariosTotais));
+                        renderizarPaginacao(usuariosTotais.length);
+                    };
+                    paginacao.appendChild(li);
+                }
+            }
+
+            function abrirModalUsuarios() {
+                const corpoModal = document.getElementById('corpoModalUsuarios');
+                corpoModal.innerHTML = '';
+
+                usuariosTotais.forEach(u => {
+                    corpoModal.innerHTML += `
+      <tr>
+        <td>${u.nome}</td>
+        <td>${u.cpf}</td>
+        <td>${u.funcao}</td>
+        <td>${u.diretoria || '-'}</td>
+      </tr>`;
+                });
+
+                const modal = new bootstrap.Modal(document.getElementById('modalUsuariosTodos'));
+                modal.show();
+            }
+            function imprimirUsuariosModal() {
+                const printWindow = window.open('', '', 'width=900,height=600');
+                const conteudo = document.getElementById('corpoModalUsuarios').innerHTML;
+
+                const html = `
+    <html>
+    <head>
+      <title>Impressão de Usuários</title>
+      <style>
+        table { width: 100%; border-collapse: collapse; font-family: Arial; }
+        th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+        th { background-color: #f0f0f0; }
+      </style>
+    </head>
+    <body>
+      <h3>Todos os Usuários - AEA-DF</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Função</th>
+            <th>Diretoria</th>
+          </tr>
+        </thead>
+        <tbody>${conteudo}</tbody>
+      </table>
+    </body>
+    </html>
+  `;
+
+                printWindow.document.write(html);
+                printWindow.document.close();
+                printWindow.print();
+            }
+
+        </script>
+        <Script>
+            const nome = localStorage.getItem('nome');
+            if (nome) {
+                document.getElementById('bemvindoTexto').innerText = `Bem-vindo(a), ${nome}`;
+            }
+            function atualizarBadgeDeNotificacoes(qtd) {
+                const badge = document.getElementById('notificacaoBadge');
+                if (!badge) return;
+
+                if (qtd > 0) {
+                    badge.innerText = qtd;
+                    badge.style.display = 'inline';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+            atualizarBadgeDeNotificacoes(0);
+        </Script>
+
+        <script>
+            document.getElementById('formNovoAtendimento').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const dados = {
+                    departamento_destino: document.getElementById('departamentoAtendimento').value,
+                    diretoria: document.getElementById('departamentoAtendimento').value === 'Diretorias'
+                        ? document.getElementById('diretoriaAtendimento').value
+                        : null,
+                    atendente: localStorage.getItem('nome'),
+                    solicitante: document.getElementById('solicitanteAtendimento').value,
+                    assunto: document.getElementById('assuntoAtendimento').value,
+                    data_hora: document.getElementById('dataHoraAtendimento').value,
+                    data_hora_fim: document.getElementById('dataHoraFimAtendimento').value,
+                    situacao: 'Agendado',
+                    canal: document.getElementById('canalAtendimento').value,
+                    observacoes: document.getElementById('observacoesAtendimento').value
+                };
+
+
+                fetch('/api/atendimentos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dados)
+                })
+                    .then(res => res.json())
+                    .then(resp => {
+                        if (resp.mensagem) {
+                            alert("Atendimento salvo com sucesso!");
+                            document.getElementById('formNovoAtendimento').reset();
+                            carregarAtendimentos(); // Atualiza a lista
+                        } else {
+                            alert("Erro ao salvar atendimento.");
+                        }
+                    });
+            });
+
+            // 🔄 Variáveis globais
+            let atendimentosTotais = [];
+            let paginaAtualAtendimento = 1;
+            const atendimentosPorPagina = 5;
+
+            document.addEventListener("DOMContentLoaded", () => {
+                carregarAtendimentos();
+                document.getElementById('filtroDepartamento').addEventListener('change', carregarAtendimentos);
+                document.getElementById('filtroStatus').addEventListener('change', carregarAtendimentos);
+                document.getElementById('filtroDataInicio').addEventListener('change', carregarAtendimentos);
+                document.getElementById('filtroDataFim').addEventListener('change', carregarAtendimentos);
+            });
+
+            function carregarAtendimentos() {
+                fetch('/api/atendimentos')
+                    .then(res => res.json())
+                    .then(lista => {
+                        const dep = document.getElementById('filtroDepartamento').value.trim();
+                        const situacao = document.getElementById('filtroStatus').value.trim();
+                        const dataInicio = document.getElementById('filtroDataInicio').value;
+                        const dataFim = document.getElementById('filtroDataFim').value;
+
+                        atendimentosTotais = lista.filter(a => {
+                            const atendeDep = !dep || a.departamento_destino === dep;
+                            const atendeSituacao = !situacao || a.situacao === situacao;
+                            const data = new Date(a.data_hora);
+                            const dentroInicio = !dataInicio || data >= new Date(dataInicio);
+                            const dentroFim = !dataFim || data <= new Date(dataFim + "T23:59:59");
+                            return atendeDep && atendeSituacao && dentroInicio && dentroFim;
+                        });
+
+                        paginaAtualAtendimento = 1;
+                        renderizarAtendimentos();
+                        renderizarPaginacaoAtendimentos();
+                    });
+            }
+
+            function renderizarAtendimentos() {
+                const tabela = document.getElementById('tabelaAtendimentos');
+                tabela.innerHTML = '';
+
+                const inicio = (paginaAtualAtendimento - 1) * atendimentosPorPagina;
+                const fim = inicio + atendimentosPorPagina;
+                console.log("👉 Lista total de atendimentos:", atendimentosTotais);
+                const pagina = atendimentosTotais.slice(inicio, fim);
+
+                if (!Array.isArray(pagina)) {
+                    console.error("⚠️ Erro: 'pagina' não é um array:", pagina);
+                    return;
+                }
+
+                pagina.forEach(a => {
+                    const dataFormatada = new Date(a.data_hora).toLocaleString('pt-BR');
+                    const horaFim = a.data_hora_fim ? a.data_hora_fim.slice(0, 5) : '-';
+                    tabela.innerHTML += `
+        <tr>
+            <td>${a.departamento_destino}</td>
+            <td>${a.diretoria || '-'}</td>
+            <td>${a.solicitante}</td>
+            <td>${a.atendente}</td>
+            <td>${dataFormatada}</td>
+            <td>${horaFim}</td>
+            <td>${a.assunto}</td>
+            <td>${a.situacao}</td>
+            <td class="d-flex flex-wrap gap-1">
+                <button class="btn btn-sm btn-outline-secondary" onclick="visualizarAtendimento(${a.id})"><i class="bi bi-eye-fill"></i></button>
+                <button class="btn btn-sm btn-outline-primary" onclick="editarAtendimento(${a.id})">Editar</button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deletarAtendimento(${a.id})">Excluir</button>
+            </td>
+        </tr>`;
+                });
+            }
+
+            function renderizarPaginacaoAtendimentos() {
+                const totalPaginas = Math.ceil(atendimentosTotais.length / atendimentosPorPagina);
+                const paginacao = document.getElementById('paginacaoAtendimentos');
+                paginacao.innerHTML = '';
+
+                for (let i = 1; i <= totalPaginas; i++) {
+                    const li = document.createElement('li');
+                    li.className = `page-item ${i === paginaAtualAtendimento ? 'active' : ''}`;
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    li.onclick = () => {
+                        paginaAtualAtendimento = i;
+                        renderizarAtendimentos();
+                        renderizarPaginacaoAtendimentos();
+                    };
+                    paginacao.appendChild(li);
+                }
+            }
+
+            function deletarAtendimento(id) {
+                if (confirm("Tem certeza que deseja excluir este atendimento?")) {
+                    fetch(`/api/atendimentos/${id}`, {
+                        method: 'DELETE'
+                    })
+                        .then(res => res.json())
+                        .then(resp => {
+                            if (resp.mensagem) {
+                                alert("Atendimento excluído com sucesso.");
+                                carregarAtendimentos(); // Atualiza a tabela
+                            } else {
+                                alert("Erro ao excluir atendimento.");
+                            }
+                        });
+                }
+            }
+            function preencherCamposModalEdicao(atendimento) {
+                document.getElementById('editId').value = atendimento.id;
+                document.getElementById('editSolicitante').value = atendimento.solicitante;
+                document.getElementById('editAtendente').value = atendimento.atendente;
+                document.getElementById('editDataHora').value = atendimento.data_hora.slice(0, 16);
+
+                const inputHoraFim = document.getElementById('editDataHoraFim');
+                if (inputHoraFim) {
+                    try {
+                        if (atendimento.data_hora_fim && atendimento.data_hora_fim.includes(':')) {
+                            const horaObj = new Date(`1970-01-01T${atendimento.data_hora_fim}`);
+                            const hh = String(horaObj.getHours()).padStart(2, '0');
+                            const mm = String(horaObj.getMinutes()).padStart(2, '0');
+                            inputHoraFim.value = `${hh}:${mm}`;
+                        } else {
+                            inputHoraFim.value = '';
+                        }
+                    } catch (err) {
+                        console.warn("⚠️ Erro ao processar data_hora_fim:", atendimento.data_hora_fim, err);
+                        inputHoraFim.value = '';
+                    }
+                }
+
+                document.getElementById('editDepartamento').value = atendimento.departamento_destino;
+                document.getElementById('editAssunto').value = atendimento.assunto;
+                document.getElementById('editCanal').value = atendimento.canal;
+                document.getElementById('editObservacoes').value = atendimento.observacoes;
+            }
+
+            function editarAtendimento(id) {
+                fetch(`/api/atendimentos`)
+                    .then(res => res.json())
+                    .then(lista => {
+                        const atendimento = lista.find(a => a.id === id);
+                        if (!atendimento) return alert("Atendimento não encontrado.");
+
+                        // Mostra o modal
+                        const modalElement = document.getElementById('modalEditarAtendimento');
+                        const modal = new bootstrap.Modal(modalElement);
+                        modal.show();
+
+                        // Aguarda o DOM aplicar as transições do Bootstrap
+                        setTimeout(() => {
+                            preencherCamposModalEdicao(atendimento);
+                        }, 300);
+                    });
+            }
+
+            document.getElementById('formEditarAtendimento').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const id = document.getElementById('editId').value;
+
+                const dataInicio = document.getElementById('editDataHora').value;
+                const horaFim = document.getElementById('editDataHoraFim').value;
+
+                let dataHoraFimCompleta = null;
+                if (horaFim && horaFim.match(/^\d{2}:\d{2}$/)) {
+                    dataHoraFimCompleta = horaFim; // Salva somente 'HH:mm'
+                }
+                const dados = {
+                    departamento_destino: document.getElementById('editDepartamento').value,
+                    diretoria: document.getElementById('editDepartamento').value === 'Diretorias'
+                        ? document.getElementById('editDiretoria').value
+                        : null,
+                    atendente: localStorage.getItem('nome'),
+                    solicitante: document.getElementById('editSolicitante').value,
+                    assunto: document.getElementById('editAssunto').value,
+                    data_hora: dataInicio,
+                    data_hora_fim: dataHoraFimCompleta,
+                    canal: document.getElementById('editCanal').value,
+                    observacoes: document.getElementById('editObservacoes').value
+                };
+
+                fetch(`/api/atendimentos/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dados)
+                })
+                    .then(res => res.json())
+                    .then(resp => {
+                        if (resp.mensagem) {
+                            alert("Atendimento atualizado!");
+                            bootstrap.Modal.getInstance(document.getElementById('modalEditarAtendimento')).hide();
+                            carregarAtendimentos();
+                        } else {
+                            alert("Erro ao atualizar.");
+                        }
+                    });
+            });
+            function visualizarAtendimento(id) {
+                fetch('/api/atendimentos')
+                    .then(res => res.json())
+                    .then(lista => {
+                        const atendimento = lista.find(a => a.id === id);
+                        if (!atendimento) return alert("Atendimento não encontrado.");
+
+                        const dataFormatada = new Date(atendimento.data_hora).toLocaleString('pt-BR');
+
+                        const conteudo = `
+                <p><strong>Departamento:</strong> ${atendimento.departamento_destino}</p>
+                <p><strong>Diretoria:</strong> ${atendimento.diretoria || '-'}</p>
+                <p><strong>Solicitante:</strong> ${atendimento.solicitante}</p>
+                <p><strong>Atendente:</strong> ${atendimento.atendente}</p>
+                <p><strong>Data/Hora:</strong> ${dataFormatada}</p>
+                <p><strong>Assunto:</strong> ${atendimento.assunto}</p>
+                <p><strong>Canal:</strong> ${atendimento.canal}</p>
+                <p><strong>Situação:</strong> ${atendimento.situacao}</p>
+                <p><strong>Observações:</strong><br>${atendimento.observacoes || 'Nenhuma'}</p>
+            `;
+
+                        document.getElementById('conteudoAtendimentoDetalhes').innerHTML = conteudo;
+                        const modal = new bootstrap.Modal(document.getElementById('modalVisualizarAtendimento'));
+                        modal.show();
+                    });
+            }
+
+            function imprimirAtendimentoDetalhes() {
+                const conteudo = document.getElementById('conteudoAtendimentoDetalhes').innerHTML;
+
+                const html = `
+    <html>
+    <head>
+        <title>Atendimento AEA-DF</title>
+        <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            h3 { color: #003E70; }
+            p { margin-bottom: 8px; }
+        </style>
+    </head>
+    <body>
+        <h3>Detalhes do Atendimento - AEA-DF</h3>
+        ${conteudo}
+    </body>
+    </html>
+    `;
+
+                const win = window.open('', '', 'width=800,height=600');
+                win.document.write(html);
+                win.document.close();
+                win.print();
+            }
+
+            // 🔍 Aplica os filtros ao carregar a lista
+            function aplicarFiltrosAtendimentos(lista) {
+                const filtroDepartamento = document.getElementById('filtroDepartamento').value.toLowerCase();
+                const filtroStatus = document.getElementById('filtroStatus').value.toLowerCase();
+                const filtroDataInicio = document.getElementById('filtroDataInicio').value;
+                const filtroDataFim = document.getElementById('filtroDataFim').value;
+
+                return lista.filter(at => {
+                    const matchDepartamento = !filtroDepartamento || at.departamento_destino.toLowerCase() === filtroDepartamento;
+                    const matchStatus = !filtroStatus || at.situacao.toLowerCase() === filtroStatus;
+
+                    let matchData = true;
+                    if (filtroDataInicio) {
+                        matchData = new Date(at.data_hora) >= new Date(filtroDataInicio);
+                    }
+                    if (matchData && filtroDataFim) {
+                        matchData = new Date(at.data_hora) <= new Date(filtroDataFim + "T23:59:59");
+                    }
+
+                    return matchDepartamento && matchStatus && matchData;
+                });
+            }
+            document.addEventListener("DOMContentLoaded", function () {
+                carregarAtendimentos(); // ✅ exibe tudo ao carregar
+
+                document.getElementById('filtroDepartamento').addEventListener('change', carregarAtendimentos);
+                document.getElementById('filtroStatus').addEventListener('change', carregarAtendimentos);
+                document.getElementById('filtroDataInicio').addEventListener('change', carregarAtendimentos);
+                document.getElementById('filtroDataFim').addEventListener('change', carregarAtendimentos);
+            });
+
+
+            function abrirModalAtendimentos() {
+                fetch('/api/atendimentos')
+                    .then(res => res.json())
+                    .then(lista => {
+                        const corpo = document.getElementById('corpoModalAtendimentos');
+                        corpo.innerHTML = '';
+
+                        lista.forEach(a => {
+                            const dataFormatada = new Date(a.data_hora).toLocaleString('pt-BR');
+                            corpo.innerHTML += `
+                    <tr>
+                        <td>${a.departamento_destino}</td>
+                        <td>${a.diretoria || '-'}</td>
+                        <td>${a.solicitante}</td>
+                        <td>${a.atendente}</td>
+                        <td>${dataFormatada}</td>
+                        <td>${a.assunto}</td>
+                        <td>${a.canal}</td>
+                        <td>${a.situacao}</td>
+                        <td>${a.observacoes || '—'}</td>
+                    </tr>
+                `;
+                        });
+
+                        const modal = new bootstrap.Modal(document.getElementById('modalTodosAtendimentos'));
+                        modal.show();
+                    });
+            }
+            function imprimirTodosAtendimentos() {
+                const conteudo = document.getElementById('corpoModalAtendimentos').innerHTML;
+
+                const html = `
+        <html>
+        <head>
+            <title>Relatório de Atendimentos</title>
+            <style>
+                table { width: 100%; border-collapse: collapse; font-family: Arial; }
+                th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+                th { background-color: #f8f8f8; }
+            </style>
+        </head>
+        <body>
+            <h3>Relatório Completo - AEA-DF</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Departamento</th>
+                        <th>Diretoria</th>
+                        <th>Solicitante</th>
+                        <th>Atendente</th>
+                        <th>Data/Hora</th>
+                        <th>Assunto</th>
+                        <th>Canal</th>
+                        <th>Situação</th>
+                        <th>Observações</th>
+                    </tr>
+                </thead>
+                <tbody>${conteudo}</tbody>
+            </table>
+        </body>
+        </html>
+    `;
+
+                const win = window.open('', '', 'width=900,height=600');
+                win.document.write(html);
+                win.document.close();
+                win.print();
+            }
+
+
+        </script>
+        <Script>
+            document.getElementById('departamentoAtendimento').addEventListener('change', function () {
+                const campoDiretoria = document.getElementById('campoDiretoriaAtendimento');
+                campoDiretoria.classList.toggle('d-none', this.value !== 'Diretorias');
+            });
+
+        </Script>
+        <script>
+            let chart;
+
+            async function carregarResumoGeral(periodo = '', diretoria = '', situacao = '') {
+                try {
+                    const res = await fetch(`/api/atendimentos/resumo?periodo=${periodo}&diretoria=${diretoria}&situacao=${situacao}`);
+                    const data = await res.json();
+
+                    document.getElementById('totalAtendimentos').textContent = data.total || 0;
+                    document.getElementById('totalConfirmados').textContent = data.confirmado || 0;
+                    document.getElementById('totalAgendados').textContent = data.agendado || 0;
+                    document.getElementById('totalCancelados').textContent = data.cancelado || 0;
+
+                    atualizarGrafico([data.agendado, data.confirmado, data.cancelado]);
+
+                } catch (err) {
+                    console.error('Erro ao carregar resumo:', err);
+                }
+            }
+
+
+            let graficoBarras;
+
+            function atualizarGraficoBarras(dados) {
+                const ctx = document.getElementById('graficoResumo').getContext('2d');
+
+                if (graficoBarras) graficoBarras.destroy();
+
+                graficoBarras = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Agendado', 'Confirmado', 'Cancelado'],
+                        datasets: [{
+                            label: 'Total por Situação',
+                            data: dados,
+                            backgroundColor: ['#ffc107', '#0d6efd', '#dc3545']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            }
+            let graficoPizza;
+
+            function atualizarGraficoPizza(dados) {
+                const ctx = document.getElementById('graficoPizzaResumo').getContext('2d');
+
+                if (graficoPizza) graficoPizza.destroy();
+
+                graficoPizza = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Agendado', 'Confirmado', 'Cancelado'],
+                        datasets: [{
+                            label: 'Distribuição',
+                            data: dados,
+                            backgroundColor: ['#ffc107', '#0d6efd', '#dc3545']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            }
+
+            let graficoTemporal;
+
+            async function carregarGraficoTemporal(periodo = '1m') {
+                try {
+                    const funcao = localStorage.getItem('funcao');
+                    const loginDiretoria = localStorage.getItem('diretoria');
+
+                    const res = await fetch(`/api/atendimentos/grafico-data?funcao=${funcao}&loginDiretoria=${loginDiretoria}&periodo=${periodo}`);
+                    const data = await res.json();
+
+                    const labels = data.map(item => item.dia);
+                    const valores = data.map(item => item.total);
+
+                    const ctx = document.getElementById('graficoTemporal').getContext('2d');
+                    if (graficoTemporal) graficoTemporal.destroy();
+
+                    graficoTemporal = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels,
+                            datasets: [{
+                                label: 'Atendimentos por Dia',
+                                data: valores,
+                                backgroundColor: '#0d6efd'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: { beginAtZero: true }
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error('Erro ao carregar gráfico temporal:', error);
+                }
+            }
+
+
+
+            function aplicarFiltrosAutomaticamente() {
+                const periodo = document.getElementById('filtroPeriodo')?.value || '';
+                const diretoria = document.getElementById('filtroDiretoria')?.value || '';
+                const situacao = document.getElementById('filtroSituacao')?.value || '';
+
+                carregarResumoGeral(periodo, diretoria, situacao);
+            }
+
+
+            // Aplica filtros automaticamente ao mudar qualquer campo
+            document.addEventListener('DOMContentLoaded', () => {
+                carregarResumoGeral(); // carrega geral sem filtros no início
+
+                document.getElementById('filtroPeriodo').addEventListener('change', aplicarFiltrosAutomaticamente);
+                document.getElementById('filtroDiretoria').addEventListener('change', aplicarFiltrosAutomaticamente);
+                document.getElementById('filtroSituacao').addEventListener('change', aplicarFiltrosAutomaticamente);
+            });
+        </script>
+</body>
+
+</html>

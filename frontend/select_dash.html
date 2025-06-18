@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AEA-DF | SIAGE</title>
+    <link rel="icon" href="data:,">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 10px 10px;
+        }
+
+        header img {
+            max-width: 120px;
+        }
+
+        h1 {
+            color: #0063A6;
+            margin-top: 10px;
+            font-size: 1.4rem;
+        }
+
+        .dashboard-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 16px;
+            border: 2px solid #F39200;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: #da7e00;
+        }
+
+        .card-title {
+            color: #0063A6;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .card-text {
+            font-size: 0.95rem;
+            color: #555;
+        }
+
+        .btn-acessar {
+            background-color: #F39200;
+            color: #fff;
+            font-weight: 500;
+            border-radius: 8px;
+            padding: 10px 20px;
+        }
+
+        .btn-acessar:hover {
+            background-color: #da7e00;
+            color: #fff;
+        }
+
+        .row.g-4.justify-content-center>div {
+            display: flex;
+            justify-content: center;
+        }
+
+        .logout-button {
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 999;
+        }
+
+        @media (max-width: 576px) {
+            .logout-button {
+                padding-right: 10px;
+                padding-top: 10px;
+            }
+
+            .logout-button button {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <img src="./img/logo_aeadf-2.png" alt="Logo AEA-DF">
+        <h1>SIAGE - Sistema de Atendimento e Agendamento</h1>
+        <h5 id="bemvindo" class="text-center mt-2 text-primary"></h5>
+
+    </header>
+    <div class="logout-button text-end pe-4 pt-2">
+        <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1" onclick="sair()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                    d="M10 12a.5.5 0 0 0 .5-.5V10h3.793l-1.147 1.146a.5.5 0 0 0 .708.708l2-2a.5.5 0 0 0 0-.708l-2-2a.5.5 0 0 0-.708.708L14.293 9.5H10.5V8a.5.5 0 0 0-1 0v3.5A.5.5 0 0 0 10 12z" />
+                <path fill-rule="evenodd"
+                    d="M4.5 14A1.5 1.5 0 0 1 3 12.5v-9A1.5 1.5 0 0 1 4.5 2h7A1.5 1.5 0 0 1 13 3.5V6a.5.5 0 0 1-1 0V3.5A.5.5 0 0 0 11.5 3h-7a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5V10a.5.5 0 0 1 1 0v2.5a1.5 1.5 0 0 1-1.5 1.5h-7z" />
+            </svg>
+            Sair
+        </button>
+    </div>
+
+
+    <div class="container py-4">
+        <div class="row g-4 justify-content-center">
+
+            <!-- Painel Jurídico -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card dashboard-card shadow-sm h-100 text-center" data-funcao="juridico">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">Painel Jurídico</h5>
+                            <p class="card-text">Atendimentos com a Drª Dalila e equipe jurídica.</p>
+                        </div>
+                        <a href="./dashboard_area.html" class="btn btn-acessar mt-3">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel Contábil -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card dashboard-card shadow-sm h-100 text-center" data-funcao="contabil">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">Painel Contábil</h5>
+                            <p class="card-text">Atendimentos com a contadora responsável.</p>
+                        </div>
+                        <a href="./dashboard_area.html" class="btn btn-acessar mt-3">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel Administrativo -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card dashboard-card shadow-sm h-100 text-center" data-funcao="administrativo">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">Painel Administrativo</h5>
+                            <p class="card-text">Acesso das funcionárias para gestão de atendimentos.</p>
+                        </div>
+                        <a href="./dashboard_main.html" class="btn btn-acessar mt-3">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DE - Presidência -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card dashboard-card shadow-sm h-100 text-center" data-funcao="diretorias"
+                    data-diretoria="de_presidencia">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">DE - Presidência</h5>
+                            <p class="card-text">Painel da presidência da associação.</p>
+                        </div>
+                        <a href="./dashboard_area.html" class="btn btn-acessar mt-3">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diretoria de Administração -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card dashboard-card shadow-sm h-100 text-center" data-funcao="diretorias"
+                    data-diretoria="administracao">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">Diretoria de Administração</h5>
+                            <p class="card-text">Painel de administração geral da AEA-DF.</p>
+                        </div>
+                        <a href="./dashboard_area.html" class="btn btn-acessar mt-3">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diretoria de Finanças -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card dashboard-card shadow-sm h-100 text-center" data-funcao="diretorias"
+                    data-diretoria="financas">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">Diretoria de Finanças</h5>
+                            <p class="card-text">Painel financeiro da associação.</p>
+                        </div>
+                        <a href="./dashboard_area.html" class="btn btn-acessar mt-3">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diretoria de Esportes -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card dashboard-card shadow-sm h-100 text-center" data-funcao="diretorias"
+                    data-diretoria="esportes">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">Diretoria de Esportes</h5>
+                            <p class="card-text">Painel de atividades e eventos esportivos.</p>
+                        </div>
+                        <a href="./dashboard_area.html" class="btn btn-acessar mt-3">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diretoria de Saúde e Benefícios -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card dashboard-card shadow-sm h-100 text-center" data-funcao="diretorias"
+                    data-diretoria="saude_beneficios">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">Diretoria de Saúde e Benefícios</h5>
+                            <p class="card-text">Painel voltado à saúde e bem-estar dos associados.</p>
+                        </div>
+                        <a href="./dashboard_area.html" class="btn btn-acessar mt-3">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diretoria de Eventos Sociais -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card dashboard-card shadow-sm h-100 text-center" data-funcao="diretorias"
+                    data-diretoria="eventos_sociais">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">Diretoria de Eventos Sociais</h5>
+                            <p class="card-text">Painel de organização de eventos e confraternizações.</p>
+                        </div>
+                        <a href="./dashboard_area.html" class="btn btn-acessar mt-3">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diretoria de Cultura -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card dashboard-card shadow-sm h-100 text-center" data-funcao="diretorias"
+                    data-diretoria="cultura">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">Diretoria de Cultura</h5>
+                            <p class="card-text">Painel de ações culturais e atividades educativas.</p>
+                        </div>
+                        <a href="./dashboard_area.html" class="btn btn-acessar mt-3">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conselho Deliberativo -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card dashboard-card shadow-sm h-100 text-center" data-funcao="diretorias"
+                    data-diretoria="cultura">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">Conselho Deliberativo</h5>
+                            <p class="card-text">Painel do conselho deliberativo da AEA-DF.</p>
+                        </div>
+                        <a href="./dashboard_area.html" class="btn btn-acessar mt-3">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conselho Fiscal -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card dashboard-card shadow-sm h-100 text-center" data-funcao="diretorias"
+                    data-diretoria="conselho_fiscal">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">Conselho Fiscal</h5>
+                            <p class="card-text">Painel do conselho fiscal da associação.</p>
+                        </div>
+                        <a href="./dashboard_area.html" class="btn btn-acessar mt-3">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diretoria Executiva -->
+            <div class="col-sm-6 col-lg-4">
+                <div class="card dashboard-card shadow-sm h-100 text-center" data-funcao="diretorias"
+                    data-diretoria="executiva">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">Diretoria Executiva</h5>
+                            <p class="card-text">Painel de gestão da diretoria executiva.</p>
+                        </div>
+                        <a href="./dashboard_area.html" class="btn btn-acessar mt-3">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!--Scripts-->
+            <script>
+                function sair() {
+                    localStorage.removeItem('nome');
+                    localStorage.removeItem('funcao');
+                    window.location.href = 'login_siage.html';
+                }
+            </script>
+
+            <script>
+                const nome = localStorage.getItem('nome');
+                const funcao = localStorage.getItem('funcao');
+                const diretoriaNomeCompleto = localStorage.getItem('diretoria');
+
+                const mapaDiretorias = {
+                    'DE - Presidência': 'de_presidencia',
+                    'Diretoria de Administração': 'administracao',
+                    'Diretoria de Finanças': 'financas',
+                    'Diretoria de Esportes': 'esportes',
+                    'Diretoria de Saúde e Benefícios': 'saude_beneficios',
+                    'Diretoria de Eventos Sociais': 'eventos_sociais',
+                    'Diretoria de Cultura': 'cultura',
+                    'Conselho Deliberativo': 'conselho_deliberativo',
+                    'Conselho Fiscal': 'conselho_fiscal',
+                    'Diretoria Executiva': 'executiva'
+                };
+
+                const diretoria = mapaDiretorias[diretoriaNomeCompleto] || '';
+                if (!nome || !funcao) {
+                    window.location.href = 'login_siage.html';
+                } else {
+                    document.getElementById('bemvindo').innerText = `Bem-vindo, ${nome}`;
+                }
+
+                const cards = document.querySelectorAll('.dashboard-card');
+                let count = 0;
+
+                cards.forEach(card => {
+                    const permitido = card.dataset.funcao;
+                    const cardDiretoria = card.dataset.diretoria;
+
+                    if (funcao === 'diretorias') {
+                        if (permitido === 'diretorias' && cardDiretoria === diretoria) {
+                            count++;
+                        } else {
+                            card.parentElement.style.display = 'none';
+                        }
+                    } else {
+                        if (funcao !== permitido) {
+                            card.parentElement.style.display = 'none';
+                        } else {
+                            count++;
+                        }
+                    }
+                });
+
+                // Centralizar se só houver um card visível
+                if (count === 1) {
+                    const row = document.querySelector('.row.g-4');
+                    row.classList.remove('justify-content-center');
+                    row.classList.add('justify-content-center');
+                }
+            </script>
+
+
+
+</body>
+
+</html>

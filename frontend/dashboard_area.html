@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard AEA-DF</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        lucide.createIcons();
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+
+        .sidebar {
+            background-color: #f8f9fa;
+            border-right: 2px solid #e0e0e0;
+            color: #003E70;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+            border-bottom: 2px solid #e0e0e0;
+
+        }
+
+        .sidebar::before {
+            content: '';
+            display: block;
+            height: 4px;
+            background-color: #F39200;
+            /* dourado da AEA */
+            margin: -20px -15px 15px -15px;
+            border-radius: 8px 8px 0 0;
+        }
+
+
+
+        .nav-link {
+            color: #003E70;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            padding: 10px 12px;
+            border-radius: 6px;
+            transition: background-color 0.2s, color 0.2s;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            background-color: #F39200;
+            color: #fff !important;
+        }
+
+        .sidebar {
+            width: 333px;
+            /* antes era 220px */
+        }
+
+        .sidebar:not(.hidden)+.toggle-arrow {
+            left: 333px;
+            /* manter compatibilidade do botão */
+        }
+
+        .sidebar.hidden {
+            width: 0;
+            padding: 0;
+        }
+
+        .sidebar .logo {
+            max-width: 100%;
+            max-height: 60px;
+            object-fit: contain;
+            margin: 20px auto 10px;
+            /* ← Adiciona espaçamento no topo */
+            display: block;
+        }
+
+
+        .sidebar .logo-text,
+        .sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            /* espaçamento entre links */
+        }
+
+        .sidebar.hidden .logo-text,
+        .sidebar.hidden .text-center,
+        .sidebar.hidden nav {
+            display: none !important;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .sidebar.hidden .nav-link {
+            visibility: hidden;
+            display: none !important;
+        }
+
+
+        .toggle-arrow {
+            position: fixed;
+            top: 20px;
+            left: 10px;
+            background-color: #F39200;
+            color: white;
+            border: none;
+            border-radius: 0 6px 6px 0;
+            padding: 10px 12px;
+            z-index: 1100;
+            cursor: pointer;
+            transition: left 0.3s;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .sidebar.hidden+.toggle-arrow {
+            left: 0;
+        }
+
+        .sidebar:not(.hidden)+.toggle-arrow {
+            left: 264px;
+        }
+
+        .nav-link {
+            .nav-link {
+                color: #003E70;
+                margin: 10px 0;
+                display: flex;
+                align-items: center;
+                font-size: 0.95rem;
+                padding: 10px 12px;
+                border-radius: 6px;
+                transition: background-color 0.2s, color 0.2s;
+                font-weight: 500;
+
+                .nav-link {
+                    white-space: nowrap;
+                    /* impede quebra de linha */
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    /* adiciona "..." quando cortado */
+                }
+
+            }
+
+            .nav-link:hover {
+                background-color: #F39200;
+                color: #fff;
+            }
+        }
+
+        .nav-link:hover {
+            background-color: #F39200;
+        }
+
+        .nav-link.text-danger {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 12px;
+        }
+
+
+        .main-content {
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
+            padding: 30px;
+        }
+
+        .sidebar.hidden~.main-content {
+            margin-left: 0;
+        }
+
+        .modal-content-area {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 30px 25px;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05);
+            min-height: 85vh;
+            border-top: 5px solid #F39200;
+        }
+
+        .modal-content-area h5 {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #003E70;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-content-area h6 {
+            font-weight: 600;
+            color: #003E70;
+            margin-top: 30px;
+        }
+
+        .table-striped>tbody>tr:nth-of-type(odd) {
+            background-color: #f6f9fc;
+        }
+
+        .table thead {
+            background-color: #003E70;
+            color: #fff;
+        }
+
+        .table th,
+        .table td {
+            vertical-align: middle;
+            font-size: 0.95rem;
+        }
+
+        .btn-sm {
+            font-size: 0.85rem;
+            padding: 6px 10px;
+            font-weight: 500;
+        }
+
+        .btn-warning {
+            background-color: #F39200;
+            border: none;
+        }
+
+        .btn-warning:hover {
+            background-color: #da7e00;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #b42a3a;
+        }
+
+        .btn-success {
+            background-color: #198754;
+        }
+
+        .btn-success:hover {
+            background-color: #146c43;
+        }
+
+        #campoDiretoria select,
+        #novaFuncao,
+        #novoCpf,
+        #novoNome {
+            font-size: 0.95rem;
+            border-radius: 6px;
+            box-shadow: none;
+            border: 1px solid #ced4da;
+        }
+
+        #campoDiretoria label,
+        .modal-content-area label {
+            font-weight: 500;
+            color: #003E70;
+        }
+
+
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                height: 100%;
+                top: 0;
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding: 15px;
+            }
+
+            .toggle-arrow {
+                top: 10px;
+            }
+        }
+
+        #bemvindoTexto {
+            color: #003E70;
+            margin-top: 10px;
+            margin-left: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                height: 100%;
+                top: 0;
+                left: 0;
+                z-index: 1000;
+            }
+
+            .toggle-arrow {
+                left: 0 !important;
+                z-index: 1100;
+            }
+
+            .sidebar:not(.hidden)+.toggle-arrow {
+                left: 332px !important;
+            }
+        }
+
+        body.modal-open #toggleBtn {
+            display: none !important;
+        }
+
+        .logo-img {
+            padding: 15px;
+
+        }
+
+        /* Esconde o botão de notificações quando sidebar estiver escondida */
+        .sidebar.hidden #notificacaoContainer {
+            display: none !important;
+        }
+
+        /* Badge discreto, institucional */
+        #notificacaoBadge {
+            min-width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            padding: 0 5px;
+            line-height: 18px;
+        }
+
+        .notificacao-box {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sidebar.hidden .notificacao-box {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.9);
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            canvas {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+        }
+
+        @media print {
+
+            #sidebar,
+            #toggleBtn,
+            #notificacaoContainer,
+            .nav,
+            .btn,
+            select,
+            label,
+            .form-label,
+            .form-select,
+            .text-end,
+            .modal,
+            .modal-backdrop,
+            .toggle-arrow {
+                display: none !important;
+            }
+
+            body {
+                background-color: white !important;
+                color: black !important;
+                margin: 0;
+            }
+
+            .main-content {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100%;
+            }
+
+            .modal-content-area {
+                border: none;
+                box-shadow: none;
+            }
+
+            canvas {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+
+            h3,
+            h4,
+            h5 {
+                color: #000 !important;
+            }
+        }
+
+        @media print {
+
+            #sidebar,
+            #toggleBtn,
+            .nav,
+            .btn,
+            select,
+            label,
+            .form-label,
+            .form-select,
+            .text-end,
+            .modal,
+            .modal-backdrop,
+            .toggle-arrow {
+                display: none !important;
+            }
+
+            body {
+                background: white !important;
+                color: black !important;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+
+            canvas {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+
+            .modal-content-area {
+                border: none;
+                box-shadow: none;
+            }
+
+            h3,
+            h4,
+            h5 {
+                color: #000 !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar">
+            <div class="logo-img">
+                <a href="./select_dash.html">
+                    <img src="./img/logo_aeadf-2.png" alt="Logo AEA-DF" class="logo">
+                </a>
+            </div>
+            <div class="logo-text text-center mb-4">
+                <strong>SIAGE | AEA-DF</strong>
+            </div>
+            <div id="notificacaoContainer" class="notificacao-box text-center mb-3">
+                <button onclick="mostrarSecao('notificacoes')"
+                    class="btn btn-outline-primary position-relative shadow-sm d-inline-flex align-items-center justify-content-center"
+                    style="border-radius: 8px; width: 42px; height: 42px;">
+                    <i class="bi bi-bell fs-5"></i>
+                    <span id="notificacaoBadge"
+                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        style="font-size: 0.7rem;">
+                        0
+                    </span>
+                </button>
+            </div>
+
+
+
+            <div class="text-center mb-3">
+            </div>
+            <nav class="nav flex-column">
+                <a href="#" class="nav-link" onclick="mostrarSecao('resumo')"><i
+                        class="bi bi-bar-chart-fill me-2"></i>Resumo Geral</a>
+                <a href="#" class="nav-link" onclick="mostrarSecao('atendimentos')"><i
+                        class="bi bi-journal-text me-2"></i>Atendimentos</a>
+                <a href="#" class="nav-link text-danger" onclick="logout()"><i
+                        class="bi bi-box-arrow-right me-2"></i>Sair</a>
+            </nav>
+            <div class="d-flex justify-content-end align-items-center px-4 pt-3">
+            </div>
+        </div>
+
+        <!-- Botão fixo -->
+        <button id="toggleBtn" class="toggle-arrow" onclick="toggleSidebar()">❮</button>
+        <!-- Conteúdo Principal -->
+        <div id="mainContent" class="main-content normal w-100 px-3 px-md-4 py-4">
+            <h4 id="bemvindoTexto" class="fw-semibold d-block">Bem-vindo(a), Usuário</h4>
+            <div id="resumo" class="modal-content-area">
+                <h3 class="mb-3">📊 Resumo Geral de Atendimentos</h3>
+
+                <!-- Filtros -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <label for="filtroPeriodo" class="form-label">Período</label>
+                        <select class="form-select" id="filtroPeriodo">
+                            <option value="">Todos</option>
+                            <option value="24h">Últimas 24h</option>
+                            <option value="7d">Últimos 7 dias</option>
+                            <option value="30d">Último mês</option>
+                            <option value="ano">Este ano</option>
+                            <option value="2024">Ano 2024</option>
+                            <option value="2023">Ano 2023</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filtroDiretoria" class="form-label">Área de Atendimento</label>
+                        <select class="form-select" id="filtroDiretoria">
+                            <option value="">Todas</option>
+                            <option value="DE - Presidência">DE - Presidência</option>
+                            <option value="Diretoria de Administração">Diretoria de Administração</option>
+                            <option value="Diretoria de Finanças">Diretoria de Finanças</option>
+                            <option value="Diretoria de Esportes">Diretoria de Esportes</option>
+                            <option value="Diretoria de Saúde e Benefícios">Diretoria de Saúde e Benefícios</option>
+                            <option value="Diretoria de Eventos Sociais">Diretoria de Eventos Sociais</option>
+                            <option value="Diretoria de Cultura">Diretoria de Cultura</option>
+                            <option value="Conselho Deliberativo">Conselho Deliberativo</option>
+                            <option value="Conselho Fiscal">Conselho Fiscal</option>
+                            <option value="Diretoria Executiva">Diretoria Executiva</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filtroSituacao" class="form-label">Situação</label>
+                        <select class="form-select" id="filtroSituacao">
+                            <option value="">Todas</option>
+                            <option value="Agendado">Agendado</option>
+                            <option value="Agendado - Confirmado">Confirmado</option>
+                            <option value="Cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end justify-content-end">
+                        <button class="btn btn-outline-secondary" onclick="imprimirRelatorio()">
+                            <i class="bi bi-printer me-2"></i>Imprimir Relatório
+                        </button>
+
+                    </div>
+                </div>
+
+                <!-- Cards Totais -->
+                <div class="row text-center mb-4">
+                    <div class="col-md-3">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Total</h5>
+                                <h3 id="totalAtendimentos">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-warning">Agendado</h5>
+                                <h3 id="totalAgendados">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">Confirmado</h5>
+                                <h3 id="totalConfirmados">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-danger">Cancelado</h5>
+                                <h3 id="totalCancelados">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráficos: Barras + Pizza -->
+                <div class="row g-4 mt-2">
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <h6 class="card-title text-primary mb-3">Atendimentos por Situação</h6>
+                                <canvas id="graficoResumo" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <h6 class="card-title text-primary mb-3">Distribuição (%)</h6>
+                                <canvas id="graficoPizzaResumo" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <!-- Atendimentos -->
+            <div id="atendimentos" class="modal-content-area">
+                <h5><i class="bi bi-journal-text"></i> Seus Atendimentos</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered align-middle mt-3">
+                        <thead>
+                            <tr>
+                                <th>Departamento</th>
+                                <th>Diretoria</th>
+                                <th>Solicitante</th>
+                                <th>Atendente</th>
+                                <th>Data/Hora</th>
+                                <th>Hora Fim</th>
+                                <th>Assunto</th>
+                                <th>Situação</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaAtendimentos">
+                            <!-- preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Modal de Ação (Confirmar ou Cancelar) -->
+                <div class="modal fade" id="modalAcaoStatus" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form id="formAcaoStatus">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="tituloModalStatus"><i
+                                            class="bi bi-pencil-square me-2"></i> Atualizar Atendimento</h5>
+                                    <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="hidden" id="statusId">
+                                    <input type="hidden" id="tipoAcao"> <!-- "Concluído" ou "Cancelado" -->
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Observações</label>
+                                        <textarea class="form-control" id="observacoesExtra" rows="3"
+                                            placeholder="Ex: Atendimento cancelado por falta de documentos..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Confirmar Ação</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal de Detalhes do Atendimento -->
+            <div class="modal fade" id="modalDetalhesAtendimento" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-primary"><i class="bi bi-info-circle-fill me-2"></i>
+                                Detalhes do
+                                Atendimento</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body" id="conteudoDetalhesAtendimento">
+                            <!-- Conteúdo preenchido via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Área de Impressão (printArea) -->
+            <div id="printArea" style="display: none;">
+                <h2 class="mb-3">Relatório de Atendimentos - AEA-DF</h2>
+
+                <p id="printUserInfo" style="font-size: 0.9rem; color: #555;"></p>
+                <p><strong>Período:</strong> <span id="printFiltroPeriodo"></span> |
+                    <strong>Situação:</strong> <span id="printFiltroSituacao"></span> |
+                    <strong>Diretoria:</strong> <span id="printFiltroDiretoria"></span>
+                </p>
+
+                <!-- Gráficos -->
+                <div style="margin-top: 20px; text-align: center;">
+                    <h6>Gráfico: Situação</h6>
+                    <img id="graficoResumoPrintImg" style="max-width: 90%; margin-bottom: 30px;" />
+                </div>
+
+                <div style="text-align: center;">
+                    <h6>Gráfico: Distribuição (%)</h6>
+                    <img id="graficoPizzaPrintImg" style="max-width: 90%;" />
+                </div>
+
+
+                <!-- Resumo Geral -->
+                <table class="table table-bordered table-sm w-100 mb-4">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Total</th>
+                            <th>Agendado</th>
+                            <th>Confirmado</th>
+                            <th>Cancelado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="printTotal"></td>
+                            <td id="printAgendado"></td>
+                            <td id="printConfirmado"></td>
+                            <td id="printCancelado"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Tabela Detalhada -->
+                <h6 class="mt-4">Atendimentos Detalhados</h6>
+                <table class="table table-bordered table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Departamento</th>
+                            <th>Diretoria</th>
+                            <th>Solicitante</th>
+                            <th>Atendente</th>
+                            <th>Data/Hora</th>
+                            <th>Hora Fim</th>
+                            <th>Assunto</th>
+                            <th>Situação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="printAtendimentos"></tbody>
+                </table>
+            </div>
+
+
+            <!-- Scripts -->
+            <Script>
+                const nome = localStorage.getItem('nome');
+                if (nome) {
+                    document.getElementById('bemvindoTexto').innerText = `Bem-vindo(a), ${nome}`;
+                }
+                function atualizarBadgeDeNotificacoes(qtd) {
+                    const badge = document.getElementById('notificacaoBadge');
+                    if (!badge) return;
+
+                    if (qtd > 0) {
+                        badge.innerText = qtd;
+                        badge.style.display = 'inline';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+                atualizarBadgeDeNotificacoes(0);
+            </Script>
+
+            <script>
+                function toggleSidebar() {
+                    const sidebar = document.getElementById('sidebar');
+                    const toggleBtn = document.getElementById('toggleBtn');
+
+                    sidebar.classList.toggle('hidden');
+
+                    toggleBtn.innerHTML = sidebar.classList.contains('hidden')
+                        ? '<i class="bi bi-chevron-right"></i>'
+                        : '<i class="bi bi-chevron-left"></i>';
+                }
+
+                function mostrarSecao(secaoId) {
+                    const secoes = ['notificacoes', 'alertas', 'formulario', 'resumo', 'atendimentos', 'gerar-alertas', 'usuarios'];
+                    secoes.forEach(id => {
+                        const elemento = document.getElementById(id);
+                        if (elemento) elemento.classList.add('d-none');
+                    });
+                    const ativa = document.getElementById(secaoId);
+                    if (ativa) ativa.classList.remove('d-none');
+
+                    const notificacaoContainer = document.getElementById('notificacaoContainer');
+                    if (sidebar.classList.contains('hidden')) {
+                        notificacaoContainer.style.display = 'none';
+                    } else {
+                        notificacaoContainer.style.display = 'flex';
+                    }
+
+                }
+                const notificacaoContainer = document.getElementById('notificacaoContainer');
+                if (sidebar.classList.contains('hidden')) {
+                    notificacaoContainer.style.display = 'none';
+                } else {
+                    notificacaoContainer.style.display = 'block';
+                }
+                function logout() {
+                    localStorage.clear();
+                    window.location.href = "login_siage.html";
+                }
+                const novaFuncaoEl = document.getElementById('novaFuncao');
+                if (novaFuncaoEl) {
+                    novaFuncaoEl.addEventListener('change', function () {
+                        const campoDiretoria = document.getElementById('campoDiretoria');
+                        if (campoDiretoria) {
+                            campoDiretoria.style.display = (this.value === 'diretorias') ? 'block' : 'none';
+                        }
+                    });
+                }
+
+
+
+            </script>
+            <script>
+                function carregarAtendimentos() {
+                    fetch("/api/atendimentos")
+                        .then(res => res.json())
+                        .then(lista => {
+                            const funcao = (localStorage.getItem("funcao") || "")
+                                .toLowerCase()
+                                .normalize("NFD")
+                                .replace(/[\u0300-\u036f]/g, "");
+                            const diretoria = localStorage.getItem("diretoria") || "";
+
+                            if (funcao !== "administrativo") {
+                                lista = lista.filter(atendimento => {
+                                    const destino = (atendimento.departamento_destino || "")
+                                        .toLowerCase()
+                                        .normalize("NFD")
+                                        .replace(/[\u0300-\u036f]/g, "");
+
+                                    const dir = atendimento.diretoria || "";
+
+                                    if (funcao === "diretorias") {
+                                        return dir === diretoria;
+                                    } else {
+                                        return destino === funcao;
+                                    }
+                                });
+                            }
+
+                            const tbody = document.getElementById("tabelaAtendimentos");
+                            tbody.innerHTML = "";
+
+                            if (lista.length === 0) {
+                                tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">Nenhum atendimento disponível.</td></tr>`;
+                                return;
+                            }
+                            lista.forEach(a => {
+                                const dataHora = new Date(a.data_hora);
+                                const horaFim = a.data_hora_fim ? new Date(`1970-01-01T${a.data_hora_fim}`) : null;
+
+                                const dataFormatada = dataHora.toLocaleDateString("pt-BR");
+                                const horaFormatada = dataHora.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
+                                const horaFimFormatada = horaFim ? horaFim.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' }) : '-';
+                                const linha = `
+<tr>
+  <td>${a.departamento_destino}</td>
+  <td>${a.diretoria || '-'}</td>
+  <td>${a.solicitante}</td>
+  <td>${a.atendente || '-'}</td>
+  <td>${dataFormatada} - ${horaFormatada}</td>
+  <td>${horaFimFormatada}</td>
+  <td>${a.assunto}</td>
+  <td>${a.situacao}</td>
+  <td class="text-center">
+    <button class="btn btn-outline-primary btn-sm me-1" onclick="verDetalhes(${a.id})">👁️</button>
+    <button class="btn btn-outline-success btn-sm me-1" onclick="abrirModalStatus(${a.id}, 'Concluído')">✅</button>
+    <button class="btn btn-outline-danger btn-sm" onclick="abrirModalStatus(${a.id}, 'Cancelado')">❌</button>
+  </td>
+</tr>
+`;
+
+                                tbody.insertAdjacentHTML("beforeend", linha);
+                            });
+                        });
+                }
+
+
+                function confirmarAtendimento(id) {
+                    const obs = prompt("Deseja adicionar uma observação?");
+                    if (obs === null) return;
+
+                    fetch(`/api/atendimentos/${id}/status`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ situacao: "Confirmado", observacoes_extra: obs })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            alert(data.mensagem || "Atendimento confirmado.");
+                            carregarAtendimentos();
+                        });
+                }
+
+                function cancelarAtendimento(id) {
+                    const obs = prompt("Informe o motivo do cancelamento:");
+                    if (obs === null) return;
+
+                    fetch(`/api/atendimentos/${id}/status`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ situacao: "Cancelado", observacoes_extra: obs })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            alert(data.mensagem || "Atendimento cancelado.");
+                            carregarAtendimentos();
+                        });
+                }
+
+                document.addEventListener("DOMContentLoaded", () => {
+                    const nome = localStorage.getItem("nome");
+                    const funcao = (localStorage.getItem("funcao") || "").toLowerCase();
+
+                    // Atualiza texto de boas-vindas
+                    if (nome) {
+                        document.getElementById("bemvindoTexto").innerText = `Bem-vindo(a), ${nome}`;
+                    }
+
+                    // Oculta filtro de diretoria se não for administrativo
+                    if (funcao !== "administrativo") {
+                        const campoDiretoria = document.getElementById("filtroDiretoria");
+                        if (campoDiretoria) {
+                            campoDiretoria.parentElement.style.display = "none";
+                        }
+                    }
+
+                    mostrarSecao('resumo');
+                    carregarAtendimentos();
+                });
+
+                function abrirModalStatus(id, tipo) {
+                    document.getElementById("statusId").value = id;
+                    document.getElementById("tipoAcao").value = tipo;
+                    document.getElementById("observacoesExtra").value = "";
+
+                    const titulo = tipo === "Concluído" ? "Confirmar Atendimento" : "Cancelar Atendimento";
+                    document.getElementById("tituloModalStatus").innerHTML = `<i class="bi bi-pencil-square me-2"></i> ${titulo}`;
+
+                    new bootstrap.Modal(document.getElementById("modalAcaoStatus")).show();
+                }
+
+                document.getElementById("formAcaoStatus").addEventListener("submit", function (e) {
+                    e.preventDefault();
+
+                    const id = document.getElementById("statusId").value;
+                    const situacao = document.getElementById("tipoAcao").value;
+                    const observacoes_extra = document.getElementById("observacoesExtra").value;
+
+                    fetch(`/api/atendimentos/${id}/status`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ situacao, observacoes_extra })
+                    })
+                        .then(res => res.json())
+                        .then(dados => {
+                            alert(dados.mensagem || "Status atualizado!");
+                            const modal = bootstrap.Modal.getInstance(document.getElementById("modalAcaoStatus"));
+                            modal.hide();
+                            carregarAtendimentos();
+                        })
+                        .catch(() => alert("Erro ao atualizar status!"));
+                });
+                function verDetalhes(id) {
+                    fetch(`/api/atendimentos`)
+                        .then(res => res.json())
+                        .then(lista => {
+                            const atendimento = lista.find(a => a.id === id);
+                            if (!atendimento) {
+                                alert("Atendimento não encontrado!");
+                                return;
+                            }
+
+                            const dataHora = new Date(atendimento.data_hora);
+                            const dataFormatada = dataHora.toLocaleDateString("pt-BR");
+                            const horaFormatada = dataHora.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
+
+                            const horaFim = atendimento.data_hora_fim
+                                ? new Date(`1970-01-01T${atendimento.data_hora_fim}`).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })
+                                : '-';
+
+                            const html = `
+                <div class="row g-3">
+                  <div class="col-md-6"><strong>Departamento:</strong> ${atendimento.departamento_destino}</div>
+                  <div class="col-md-6"><strong>Diretoria:</strong> ${atendimento.diretoria || '-'}</div>
+                  <div class="col-md-6"><strong>Solicitante:</strong> ${atendimento.solicitante}</div>
+                  <div class="col-md-6"><strong>Atendente:</strong> ${atendimento.atendente || '-'}</div>
+                  <div class="col-md-6"><strong>Data:</strong> ${dataFormatada}</div>
+                  <div class="col-md-6"><strong>Hora Início:</strong> ${horaFormatada}</div>
+                  <div class="col-md-6"><strong>Hora Fim:</strong> ${horaFim}</div>
+                  <div class="col-md-6"><strong>Canal:</strong> ${atendimento.canal || '-'}</div>
+                  <div class="col-md-6"><strong>Assunto:</strong> ${atendimento.assunto}</div>
+                  <div class="col-md-6"><strong>Situação:</strong> ${atendimento.situacao}</div>
+                  <div class="col-12"><strong>Observações:</strong><br>${(atendimento.observacoes || '').replace(/\n/g, "<br>")}</div>
+                </div>
+            `;
+
+                            document.getElementById("conteudoDetalhesAtendimento").innerHTML = html;
+                            new bootstrap.Modal(document.getElementById("modalDetalhesAtendimento")).show();
+                        })
+                        .catch(() => alert("Erro ao carregar detalhes."));
+                }
+            </script>
+            <script>
+                let chart;
+
+                async function carregarResumoGeral(periodo = '', diretoria = '', situacao = '') {
+                    try {
+                        const funcao = localStorage.getItem('funcao') || '';
+                        const loginDiretoria = localStorage.getItem('diretoria') || '';
+
+                        const query = new URLSearchParams({
+                            periodo,
+                            diretoria,
+                            situacao,
+                            funcao,
+                            loginDiretoria
+                        });
+
+                        const res = await fetch(`/api/atendimentos/resumo?${query}`);
+                        const data = await res.json();
+
+                        document.getElementById('totalAtendimentos').textContent = data.total || 0;
+                        document.getElementById('totalAgendados').textContent = data.agendado || 0;
+                        document.getElementById('totalConfirmados').textContent = data.confirmado || 0;
+                        document.getElementById('totalCancelados').textContent = data.cancelado || 0;
+
+                        atualizarGrafico([data.agendado, data.confirmado, data.cancelado]);
+                        atualizarGraficoPizza([data.agendado, data.confirmado, data.cancelado]);
+
+                    } catch (err) {
+                        console.error('Erro ao carregar resumo:', err);
+                    }
+                }
+
+
+                function atualizarGrafico(dados) {
+                    const ctx = document.getElementById('graficoResumo').getContext('2d');
+                    if (chart) chart.destroy();
+
+                    chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Agendado', 'Confirmado', 'Cancelado'],
+                            datasets: [{
+                                label: 'Total por Situação',
+                                data: dados,
+                                backgroundColor: ['#ffc107', '#0d6efd', '#dc3545']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: { beginAtZero: true }
+                            }
+                        }
+                    });
+                }
+
+                function aplicarFiltrosAutomaticamente() {
+                    const periodo = document.getElementById('filtroPeriodo').value;
+                    const situacao = document.getElementById('filtroSituacao').value;
+
+                    const funcao = (localStorage.getItem("funcao") || "").toLowerCase();
+                    const diretoria = localStorage.getItem("diretoria") || "";
+
+                    // Envia diretoria apenas se for administrativo
+                    const filtroDiretoria = (funcao === "administrativo") ? (document.getElementById('filtroDiretoria')?.value || '') : diretoria;
+
+                    carregarResumoGeral(periodo, filtroDiretoria, situacao);
+                }
+
+
+                // Aplica automaticamente ao carregar e ao trocar filtros
+                document.addEventListener('DOMContentLoaded', () => {
+                    // Esperar até que o DOM esteja pronto
+                    const resumoSection = document.getElementById('resumo');
+
+                    // Executar apenas se a seção existir (ex: dashboard_area.html)
+                    if (resumoSection) {
+                        carregarResumoGeral();
+                        carregarGraficoTemporal();
+                        const filtroPeriodo = document.getElementById('filtroPeriodo');
+                        const filtroSituacao = document.getElementById('filtroSituacao');
+
+                        if (filtroPeriodo) filtroPeriodo.addEventListener('change', aplicarFiltrosAutomaticamente);
+                        if (filtroSituacao) filtroSituacao.addEventListener('change', aplicarFiltrosAutomaticamente);
+
+                    }
+                });
+                function atualizarGraficoPizza(dados) {
+                    const ctx = document.getElementById('graficoPizzaResumo').getContext('2d');
+                    if (window.pizzaChart) window.pizzaChart.destroy();
+
+                    // Captura os gráficos como imagens
+                    const graficoBarImg = window.chart.toBase64Image();
+                    const graficoPizzaImg = window.pizzaChart.toBase64Image();
+
+                    // Insere as imagens nos elementos de impressão
+                    document.getElementById('graficoResumoPrintImg').src = graficoBarImg;
+                    document.getElementById('graficoPizzaPrintImg').src = graficoPizzaImg;
+
+                }
+                function imprimirRelatorio() {
+                    const nome = localStorage.getItem('nome') || 'Usuário';
+                    const funcao = localStorage.getItem('funcao') || '';
+                    const diretoria = localStorage.getItem('diretoria') || 'Todas';
+
+                    const periodoTexto = document.getElementById('filtroPeriodo').selectedOptions[0]?.textContent || 'Todos';
+                    const situacaoTexto = document.getElementById('filtroSituacao').selectedOptions[0]?.textContent || 'Todas';
+
+                    document.getElementById('printUserInfo').textContent = `Emitido por: ${nome} | Função: ${funcao} | ${new Date().toLocaleDateString()}`;
+                    document.getElementById('printFiltroPeriodo').textContent = periodoTexto;
+                    document.getElementById('printFiltroSituacao').textContent = situacaoTexto;
+                    document.getElementById('printFiltroDiretoria').textContent = diretoria;
+
+                    document.getElementById('printTotal').textContent = document.getElementById('totalAtendimentos').textContent;
+                    document.getElementById('printAgendado').textContent = document.getElementById('totalAgendados').textContent;
+                    document.getElementById('printConfirmado').textContent = document.getElementById('totalConfirmados').textContent;
+                    document.getElementById('printCancelado').textContent = document.getElementById('totalCancelados').textContent;
+
+                    const tbody = document.getElementById('tabelaAtendimentos');
+                    const printBody = document.getElementById('printAtendimentos');
+                    printBody.innerHTML = '';
+
+                    tbody.querySelectorAll('tr').forEach(row => {
+                        const clone = row.cloneNode(true);
+                        clone.querySelectorAll('td')[8]?.remove(); // remove ações
+                        printBody.appendChild(clone);
+                    });
+
+                    // 🎯 Renderizar gráficos para impressão
+                    const dadosGrafico = [
+                        parseInt(document.getElementById('totalAgendados').textContent),
+                        parseInt(document.getElementById('totalConfirmados').textContent),
+                        parseInt(document.getElementById('totalCancelados').textContent)
+                    ];
+
+                    const ctxBarPrint = document.getElementById('graficoResumoPrint').getContext('2d');
+                    const ctxPiePrint = document.getElementById('graficoPizzaPrint').getContext('2d');
+
+                    new Chart(ctxBarPrint, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Agendado', 'Confirmado', 'Cancelado'],
+                            datasets: [{
+                                label: 'Total por Situação',
+                                data: dadosGrafico,
+                                backgroundColor: ['#ffc107', '#0d6efd', '#dc3545']
+                            }]
+                        },
+                        options: {
+                            responsive: false,
+                            plugins: { legend: { display: false } },
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    });
+
+                    new Chart(ctxPiePrint, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Agendado', 'Confirmado', 'Cancelado'],
+                            datasets: [{
+                                label: 'Distribuição',
+                                data: dadosGrafico,
+                                backgroundColor: ['#ffc107', '#0d6efd', '#dc3545']
+                            }]
+                        },
+                        options: {
+                            responsive: false,
+                            plugins: { legend: { position: 'bottom' } }
+                        }
+                    });
+
+                    // ⏱ Aguarda renderização dos gráficos antes de imprimir
+                    setTimeout(() => {
+                        const originalBody = document.body.innerHTML;
+                        const printHTML = document.getElementById('printArea').innerHTML;
+
+                        document.body.innerHTML = printHTML;
+                        window.print();
+                        document.body.innerHTML = originalBody;
+                        location.reload();
+                    }, 600); // 600ms para garantir que os gráficos estejam prontos
+                }
+
+
+
+
+            </script>
+
+
+
+
+</body>
+
+</html>
